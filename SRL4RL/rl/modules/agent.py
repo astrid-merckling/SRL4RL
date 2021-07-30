@@ -143,6 +143,7 @@ class Agent(Saver):
                 " self.currentEpisodesRollout vary with respect to the SRL training "
                 mb_obs = np.zeros(
                     [self.currentEpisodesRollout, self.buffer.horizon + 1, *[i for i in self.env_params['obs']]])
+                mb_g = np.zeros([self.currentEpisodesRollout, self.buffer.horizon, self.env_params['goal']])
                 mb_r = np.zeros([self.currentEpisodesRollout, self.buffer.horizon, 1])
                 mb_actions = np.zeros(
                     [self.currentEpisodesRollout, self.buffer.horizon, self.env_params['action']])
@@ -193,10 +194,11 @@ class Agent(Saver):
                         mb_obs[Nroll, n_steps] = state
                         mb_r[Nroll, n_steps] = reward
                         mb_actions[Nroll, n_steps] = pi
+                        if self.with_goal:
+                            mb_g[Nroll, n_steps] = g
 
                     "update state"
                     state = state_new
-                    if self.with_goal: ag = ag_new
 
                     n_steps += 1
                     assert n_steps <= self.maxStepsReal, "wrong max_episode_steps"
@@ -213,7 +215,7 @@ class Agent(Saver):
                 maxStep = min(new_step_buffer + past_idx, self.buffer.capacity)
                 self.o_norm.update_normalizer(self.buffer.buffers['obs'][past_idx:maxStep])
             else:
-                episode_batch = [mb_obs, mb_r, mb_actions]
+                episode_batch = [mb_obs, mb_g, mb_r, mb_actions]
                 self.buffer.store_episode(episode_batch)
                 "Update normalizer before RL_training"
                 self._update_normalizer(episode_batch)

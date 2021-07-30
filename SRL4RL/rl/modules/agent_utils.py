@@ -82,18 +82,15 @@ class Trainer():
 
     # update the normalizer
     def _update_normalizer(self, episode_batch):
-        mb_obs, mb_ag, mb_g, mb_r, mb_actions = episode_batch
+        mb_obs, mb_g, mb_r, mb_actions = episode_batch
         mb_obs_next = mb_obs[:, 1:, :]
         # create the new buffer to store them
         if self.with_goal:
-            mb_ag_next = mb_ag[:, 1:, :]
             buffer_temp = {'obs': mb_obs,
-                           'ag': mb_ag,
                            'g': mb_g,
                            'r': mb_r,
                            'actions': mb_actions,
                            'obs_next': mb_obs_next,
-                           'ag_next': mb_ag_next,
                            }
         else:
             buffer_temp = {'obs': mb_obs,

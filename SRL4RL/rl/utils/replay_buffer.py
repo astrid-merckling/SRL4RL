@@ -33,6 +33,7 @@ class BaseReplayBuffer():
     def __init__(self, config,env_params):
         self.env_params = env_params
         self.doneAlive = config['doneAlive']
+        self.with_goal = config['with_goal']
         self.full = False
         if self.doneAlive:
             self.idx = 0
@@ -85,6 +86,12 @@ class Replay_buffer(BaseReplayBuffer):
                             'not_dones': np.empty([self.capacity, 1], dtype=np.float32),
                             'actions': np.empty([self.capacity, self.env_params['action']], dtype=np.float32),
                             }
+        elif self.with_goal:
+            self.buffers = {'obs': np.empty([self.numEpBuffer, self.horizon + 1, *[i for i in self.env_params['obs']]], dtype=np.float32),  # *self.env_params['obs']]),
+                            'g': np.empty([self.numEpBuffer, self.horizon, self.env_params['goal']], dtype=np.float32),
+                            'r': np.empty([self.numEpBuffer, self.horizon, 1], dtype=np.float32),
+                            'actions': np.empty([self.numEpBuffer, self.horizon, self.env_params['action']], dtype=np.float32),
+                            }
         else:
             self.buffers = {'obs': np.empty([self.numEpBuffer, self.horizon + 1, *[i for i in self.env_params['obs']]], dtype=np.float32),  # *self.env_params['obs']]),
                             'r': np.empty([self.numEpBuffer, self.horizon, 1], dtype=np.float32),
@@ -112,7 +119,7 @@ class Replay_buffer(BaseReplayBuffer):
     # store the episode
     def store_episode(self, episode_batch):
         "only if not doneAlive"
-        mb_obs, mb_r, mb_actions = episode_batch
+        mb_obs, mb_g, mb_r, mb_actions = episode_batch
         batch_size = mb_obs.shape[0]
         with self.lock:
             # store the informations
@@ -121,6 +128,8 @@ class Replay_buffer(BaseReplayBuffer):
             self.buffers['r'][self.idxs] = mb_r
             self.buffers['actions'][self.idxs] = mb_actions
             self.n_transitions_stored += batch_size
+            if self.with_goal:
+                self.buffers['g'][self.idxs] = mb_g
 
     def sample(self, batch_size):
         # sample the data from the replay buffer
