@@ -229,7 +229,6 @@ if args.method == 'VAE': logvar_fc.to(device).train()
 
 Loss_obs = lambda x, y, den, reduction='none': torch.nn.MSELoss(reduction=reduction)(x, y) / (den * config['n_stack'])
 
-loss_fn = Loss_obs
 if args.method in ['RAE', 'VAE']:
     pp_factor = np.prod(image_size)/args.state_dim
 parameters = []
@@ -378,14 +377,13 @@ while not early_stopper.early_stop and elapsed_epochs < args.n_epochs:
         z = reparametrize(mu, logvar)
         xHat = decoder_last_layer(decoder(z))
 
-    loss = loss_fn(np2torch(targets), xHat, num_env_notDones)
-
+    loss = Loss_obs(np2torch(targets), xHat, num_env_notDones)
     loss = np2torch(not_dones) * loss.sum((1, 2, 3))
 
     if args.method == 'RAE':
         loss += pp_factor * np2torch(not_dones) * args.decoder_latent_lambda * ((0.5 * mu.pow(2).sum(-1))) / num_env_notDones
     elif args.method == 'VAE':
-        loss += pp_factor * args.beta * np2torch(not_dones)  * (-0.5 * torch.sum(1 + logvar - mu ** 2 - logvar.exp(), dim = 1))
+        loss += pp_factor * np2torch(not_dones) * args.beta  * (-0.5 * torch.sum(1 + logvar - mu ** 2 - logvar.exp(), dim = 1)) / num_env_notDones
 
     loss = loss.sum()
 
