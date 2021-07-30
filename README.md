@@ -75,7 +75,6 @@ For the regular XSRL method:
 mpirun -np 1 python -u -W ignore SRL4RL/xsrl/scriptXSRL.py \
     --state_dim 20 \
     --env_name {TurtlebotMazeEnv-v0,ReacherBulletEnv-v0,HalfCheetahBulletEnv-v0,InvertedPendulumSwingupBulletEnv-v0} \
-    --logs_dir logsXSRL \
     --autoEntropyTuning True \
     --weightLPB 1 \
     --weightInverse 0.5 \
@@ -87,7 +86,6 @@ For XSRL-MaxEnt ablation:
 mpirun -np 1 python -u -W ignore SRL4RL/xsrl/scriptXSRL.py \
     --state_dim 20 \
     --env_name {TurtlebotMazeEnv-v0,ReacherBulletEnv-v0,HalfCheetahBulletEnv-v0,InvertedPendulumSwingupBulletEnv-v0} \
-    --logs_dir logsXSRL \
     --weightEntropy 1
 ```
 
@@ -95,8 +93,7 @@ For XSRL-random ablation:
 ```bash
 mpirun -np 1 python -u -W ignore SRL4RL/xsrl/scriptXSRL.py \
     --state_dim 20 \
-    --env_name {TurtlebotMazeEnv-v0,ReacherBulletEnv-v0,HalfCheetahBulletEnv-v0,InvertedPendulumSwingupBulletEnv-v0} \
-    --logs_dir logsXSRL
+    --env_name {TurtlebotMazeEnv-v0,ReacherBulletEnv-v0,HalfCheetahBulletEnv-v0,InvertedPendulumSwingupBulletEnv-v0}
 ```
 
 
@@ -119,8 +116,7 @@ To train a RAE model ([Regularized Autoencoder](https://arxiv.org/abs/1903.12436
 mpirun -np 1 python -u -W ignore SRL4RL/ae/scriptAE.py \
     --state_dim 20 \
     --env_name {TurtlebotMazeEnv-v0,ReacherBulletEnv-v0,HalfCheetahBulletEnv-v0,InvertedPendulumSwingupBulletEnv-v0} \
-    --logs_dir logsRAE \
-    --method rae \
+    --method RAE \
     --randomExplore True
 ```
 
