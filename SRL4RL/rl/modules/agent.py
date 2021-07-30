@@ -4,7 +4,7 @@ from mpi4py import MPI
 
 from bullet_envs.utils import env_with_goals
 
-from SRL4RL.rl.utils.replay_buffer import Replay_buffer, Replay_buffer_with_goal
+from SRL4RL.rl.utils.replay_buffer import Replay_buffer
 from SRL4RL.rl.utils.normalizer import Normalizer, TimeNormalizer
 from SRL4RL.rl.modules.agent_utils import Saver
 
