@@ -94,7 +94,7 @@ def update_args_RL(args):
     if args.env_name in ['TurtlebotEnv-v0', 'TurtlebotMazeEnv-v0', 'ReacherBulletEnv-v0', 'InvertedPendulumSwingupBulletEnv-v0']:
         args.patience = 300
         args.eval_interval = int(10)
-        if args.env_name in ['TurtlebotEnv-v0', 'ReacherBulletEnv-v0']:
+        if args.env_name in ['TurtlebotEnv-v0']: # , 'ReacherBulletEnv-v0'
             args.nb_hidden = '256'
             args.cutoff = 0
     elif args.env_name in PY_MUJOCO:

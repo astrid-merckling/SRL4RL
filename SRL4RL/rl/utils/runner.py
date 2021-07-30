@@ -3,7 +3,7 @@ import numpy as np
 import os
 import gym
 
-from bullet_envs.utils import AddNoise
+from bullet_envs.utils import AddNoise, env_with_goals
 
 from SRL4RL.utils.nn_torch import CNN, pytorch2numpy, numpy2pytorch, save_model
 from SRL4RL.utils.utilsEnv import add_noise
@@ -32,7 +32,7 @@ class StateWrapper(gym.Wrapper):
         self.obs_shape = list(obs.shape)
         self.obs_shape[1] *= self.n_stack
 
-        self.rewardFactor = self.actionRepeat if self.runner.env_name != 'ReacherBulletEnv-v0' else 1
+        self.rewardFactor = 1 if self.runner.env_name in env_with_goals else self.actionRepeat
 
     def reset(self):
         current_obs = self.env.reset()
