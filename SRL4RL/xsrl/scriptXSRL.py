@@ -413,7 +413,6 @@ else:
 "reset reset info"
 dones = [False] * args.num_envs
 envs_to_reset = np.array(dones, dtype=np.bool)
-living = np.arange(args.num_envs)[~envs_to_reset]
 reseted = np.arange(args.num_envs)[envs_to_reset]
 
 not_dones = np.array(~envs_to_reset, dtype=np.float32)
@@ -543,7 +542,6 @@ while not early_stopper.early_stop and elapsed_epochs < args.n_epochs and (not s
 
     "update reset info"
     envs_to_reset = np.array(dones, dtype=np.bool)
-    living = np.arange(args.num_envs)[~envs_to_reset]
     reseted = np.arange(args.num_envs)[envs_to_reset]
 
     not_dones = np.array(~envs_to_reset, dtype=np.float32)

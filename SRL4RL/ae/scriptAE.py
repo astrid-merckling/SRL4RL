@@ -273,11 +273,7 @@ else:
 "reset reset info"
 dones = [False] * args.num_envs
 envs_to_reset = np.array(dones, dtype=np.bool)
-living = np.arange(args.num_envs)[~envs_to_reset]
 reseted = np.arange(args.num_envs)[envs_to_reset]
-
-not_dones = np.array(~envs_to_reset, dtype=np.float32)
-num_env_notDones = num_env_notDones_dvt1 = num_env_notDones_dvt2 = max(sum(not_dones), 1)
 
 
 # Policy configs
@@ -299,7 +295,7 @@ if config['n_stack'] > 1:
 
     obs = envEval.reset()
     observation = reset_stack(obs, config)
-    target = reset_stack(obs, config)    
+    target = reset_stack(obs, config)
 
 
 if save_video:
@@ -361,12 +357,7 @@ while not early_stopper.early_stop and elapsed_epochs < args.n_epochs:
 
     "update reset info"
     envs_to_reset = np.array(dones, dtype=np.bool)
-    living = np.arange(args.num_envs)[~envs_to_reset]
     reseted = np.arange(args.num_envs)[envs_to_reset]
-
-    not_dones = np.array(~envs_to_reset, dtype=np.float32)
-    num_env_notDones = num_env_notDones_dvt1 = num_env_notDones_dvt2 = max(sum(not_dones), 1)
-
 
     "Compute AE outputs"
     mu = encoder(np2torch(observations))
@@ -377,13 +368,12 @@ while not early_stopper.early_stop and elapsed_epochs < args.n_epochs:
         z = reparametrize(mu, logvar)
         xHat = decoder_last_layer(decoder(z))
 
-    loss = Loss_obs(np2torch(targets), xHat, num_env_notDones)
-    loss = np2torch(not_dones) * loss.sum((1, 2, 3))
+    loss = Loss_obs(np2torch(targets), xHat, args.num_envs).sum((1, 2, 3))
 
     if args.method == 'RAE':
-        loss += pp_factor * np2torch(not_dones) * args.decoder_latent_lambda * ((0.5 * mu.pow(2).sum(-1))) / num_env_notDones
+        loss += pp_factor * args.decoder_latent_lambda * ((0.5 * mu.pow(2).sum(-1))) / args.num_envs
     elif args.method == 'VAE':
-        loss += pp_factor * np2torch(not_dones) * args.beta  * (-0.5 * torch.sum(1 + logvar - mu ** 2 - logvar.exp(), dim = 1)) / num_env_notDones
+        loss += pp_factor * args.beta  * (-0.5 * torch.sum(1 + logvar - mu ** 2 - logvar.exp(), dim = 1)) / args.num_envs
 
     loss = loss.sum()
 
