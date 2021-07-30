@@ -415,12 +415,6 @@ dones = [False] * args.num_envs
 envs_to_reset = np.array(dones, dtype=np.bool)
 reseted = np.arange(args.num_envs)[envs_to_reset]
 
-not_dones = np.array(~envs_to_reset, dtype=np.float32)
-num_env_notDones = num_env_notDones_dvt1 = num_env_notDones_dvt2 = max(sum(not_dones), 1)
-if args.resetPi:
-    num_env_notDones_dvt1 = max(sum(not_dones[:args.nEnv_perPi]), 1)
-    num_env_notDones_dvt2 = max(sum(not_dones[args.nEnv_perPi:]), 1)
-
 if args.keep_seed:
     del loaded_config
     gc.collect()
@@ -544,13 +538,6 @@ while not early_stopper.early_stop and elapsed_epochs < args.n_epochs and (not s
     envs_to_reset = np.array(dones, dtype=np.bool)
     reseted = np.arange(args.num_envs)[envs_to_reset]
 
-    not_dones = np.array(~envs_to_reset, dtype=np.float32)
-    num_env_notDones = num_env_notDones_dvt1 = num_env_notDones_dvt2 = max(sum(not_dones), 1)
-
-    if args.resetPi:
-        num_env_notDones_dvt1 = max(sum(not_dones[:args.nEnv_perPi]), 1)
-        num_env_notDones_dvt2 = max(sum(not_dones[args.nEnv_perPi:]), 1)
-
     "Compute next state"
     o_alpha = alpha(np2torchDev(observations))
     o_beta = beta(torch.cat((np2torchDev(states), np2torchDev(ActEnv)), dim=1))
@@ -560,8 +547,7 @@ while not early_stopper.early_stop and elapsed_epochs < args.n_epochs and (not s
     "update SRL network"
     "Reconstruct observations of current step for all trajectories"
     xHat_next = omega_last_layer(omega(s_next))
-    lossNextObs = (
-            np2torchDev(not_dones) * Loss_obs(xHat_next, np2torchDev(next_observations), num_env_notDones).sum(
+    lossNextObs = (Loss_obs(xHat_next, np2torchDev(next_observations), args.num_envs).sum(
         (1, 2, 3))).sum()
     "update alpha/beta/gamma networks"
     optimizer.zero_grad()
@@ -570,16 +556,12 @@ while not early_stopper.early_stop and elapsed_epochs < args.n_epochs and (not s
     lossNextObs_log[k_srl] = pytorch2numpy(lossNextObs)
 
     if args.resetPi:
-        lossNextObs_dvt1_sum += pytorch2numpy((np2torch(not_dones[:args.nEnv_perPi]) *
-                                               Loss_obs(xHat_next.to('cpu').detach()[:args.nEnv_perPi],
+        lossNextObs_dvt1_sum += pytorch2numpy((Loss_obs(xHat_next.to('cpu').detach()[:args.nEnv_perPi],
                                                         np2torch(next_observations[:args.nEnv_perPi]),
-                                                        num_env_notDones_dvt1).sum(
-                                                   (1, 2, 3))).sum())
-        lossNextObs_dvt2_sum += pytorch2numpy((np2torch(not_dones[args.nEnv_perPi:]) *
-                                               Loss_obs(xHat_next.to('cpu').detach()[args.nEnv_perPi:],
+                                                        args.nEnv_perPi).sum((1, 2, 3))).sum())
+        lossNextObs_dvt2_sum += pytorch2numpy((Loss_obs(xHat_next.to('cpu').detach()[args.nEnv_perPi:],
                                                         np2torch(next_observations[args.nEnv_perPi:]),
-                                                        num_env_notDones_dvt2).sum(
-                                                   (1, 2, 3))).sum())
+                                                        args.nEnv_perPi).sum((1, 2, 3))).sum())
 
     elapsed_gradients += 1
     k_srl += 1
@@ -589,17 +571,11 @@ while not early_stopper.early_stop and elapsed_epochs < args.n_epochs and (not s
     if with_discoveryPi and (elapsed_steps % args.pi_sampling == 0):
         if args.inverse:
             actions_hat = iota(torch.cat((np2torch(states), np2torch(s_next)), dim=1))
-            lossInverseSequential += (np2torch(not_dones) * Loss(actions_hat, np2torch(ActEnv),
-                                                                 num_env_notDones).sum(-1)).sum()
-            r_inverseSequential += (np2torch(not_dones[:args.nEnv_perPi]) *
-                                    Loss(actions_hat[:args.nEnv_perPi].detach(), TensActions,
-                                         num_env_notDones_dvt1).sum(-1)).sum()
+            lossInverseSequential += (Loss(actions_hat, np2torch(ActEnv),args.num_envs).sum(-1)).sum()
+            r_inverseSequential += (Loss(actions_hat[:args.nEnv_perPi].detach(), TensActions, args.nEnv_perPi).sum(-1)).sum()
 
             if args.resetPi:
-                r_inverseSequential_dvt += (np2torch(not_dones[args.nEnv_perPi:]) *
-                                            Loss(actions_hat[args.nEnv_perPi:].detach(), TensActions_dvt,
-                                                 num_env_notDones_dvt2).sum(
-                                                -1)).sum()
+                r_inverseSequential_dvt += (Loss(actions_hat[args.nEnv_perPi:].detach(), TensActions_dvt,args.nEnv_perPi).sum(-1)).sum()
 
         if args.entropy:
             r_entropySequential -= Tens_logPi.mean()
@@ -625,9 +601,7 @@ while not early_stopper.early_stop and elapsed_epochs < args.n_epochs and (not s
             input_gamma_old = torch.cat((o_alpha_old, o_beta_old), dim=1)
             s_next_old = gamma_old(input_gamma_old)
             # to be maximized by policy
-            r_LPBsequential += (
-                    np2torch(not_dones[:args.nEnv_perPi]) * Loss(s_next_old, s_nextLPB, num_env_notDones_dvt1).sum(
-                -1)).sum()
+            r_LPBsequential += (Loss(s_next_old, s_nextLPB, args.nEnv_perPi).sum(-1)).sum()
 
             if args.resetPi:
                 o_alphaLPB_dvt = alpha(np2torchDev(observations[args.nEnv_perPi:])).to('cpu').detach()
@@ -640,10 +614,7 @@ while not early_stopper.early_stop and elapsed_epochs < args.n_epochs and (not s
                     torch.cat((np2torch(states[args.nEnv_perPi:]), TensActions_dvt.detach()), dim=1))
                 input_gamma_old_dvt = torch.cat((o_alpha_old_dvt, o_beta_old_dvt), dim=1)
                 s_next_old_dvt = gamma_old(input_gamma_old_dvt)
-                r_LPBsequential_dvt += (
-                        np2torch(not_dones[args.nEnv_perPi:]) * Loss(s_next_old_dvt, s_nextLPB_dvt,
-                                                                     num_env_notDones_dvt2).sum(
-                    -1)).sum()
+                r_LPBsequential_dvt += (Loss(s_next_old_dvt, s_nextLPB_dvt,args.nEnv_perPi).sum(-1)).sum()
 
             if device == 'cuda':
                 alpha_old.to('cpu'), beta.to(device), gamma.to(device)
