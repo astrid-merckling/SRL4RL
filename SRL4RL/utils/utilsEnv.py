@@ -17,10 +17,9 @@ tensor2image = lambda x: NCWH2WHC(pytorch2numpy(x))
 
 def giveEnv_name(config):
     param_env = ''
-    if config['env_name'] in ['TurtlebotEnv-v0', 'TurtlebotMazeEnv-v0']:
-        param_env += 'fpv ' if config['fpv'] else ''
-        param_env += 'wallDistractor ' if config['wallDistractor'] else ''
-        param_env += 'withDistractor ' if config['distractor'] else ''
+    param_env += 'fpv ' if config['fpv'] else ''
+    param_env += 'wallDistractor ' if config['wallDistractor'] else ''
+    param_env += 'withDistractor ' if config['distractor'] else ''
     param_env += config['noise_type'] + ' ' if config['noise_type'] != 'none' else ''
     param_env += 'flickering-{} '.format(config['flickering']) if config['flickering']>0 else ''
     if 'randomExplor' in config:
@@ -38,8 +37,7 @@ def assert_args_envs(args):
         assert args.env_name in env_with_distractor, 'distractor not implemented'
 
 def update_args_envs(args):
-    args.fpv = args.fpv if (args.env_name in env_with_fpv) else False
-    if args.env_name == 'TurtlebotMazeEnv-v0':
+    if 'Turtlebot' in args.env_name:
         args.fpv = True
 
     if 'Turtlebot' in args.env_name:
