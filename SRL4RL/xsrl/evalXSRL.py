@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(description='State representation learning new 
 parser.add_argument('--dir', type=str, default='', help='Model path')
 parser.add_argument('--debug', type=int, default=0, help='1 for debugging')
 parser.add_argument('--renders', type=str2bool, default=False, help='')
-parser.add_argument('--nextObsEval', type=str2bool, default=True, help='')
+parser.add_argument('--nextObsEval_test', type=str2bool, default=True, help='')
 args = parser.parse_args()
 
 debug = args.debug
@@ -52,7 +52,7 @@ print('seed for evaluation is: {}'.format(seed_testDataset))
 set_seeds(seed_testDataset)
 
 # TODO: remove comments !
-if args.nextObsEval:
+if args.nextObsEval_test:
     nextObsEval = XSRL_nextObsEval(alpha, beta, gamma,omega,config,dir,suffix='eval',debug=debug)
 
 
