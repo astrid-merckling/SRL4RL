@@ -102,7 +102,7 @@ This will produce 'logsXSRL/hashCode' folder, where all the outputs are going to
 
 ### *XSRL Representations Evaluation*
 
-To evaluate a XSRL model after training run:
+To evaluate a XSRL model during/after training run:
 ```bash
 dir=<XSRL_trained_model_path>
 mpirun -np 1 python -u -W ignore SRL4RL/xsrl/evalXSRL.py \
@@ -125,7 +125,7 @@ This will produce 'logsRAE/hashCode' folder, where all the outputs are going to 
 
 ### *RAE Representations Evaluation*
 
-To evaluate a RAE model after training, run:
+To evaluate a RAE model during/after training, run:
 ```bash
 dir=<RAE_trained_model_path>
 mpirun -np 1 python -u -W ignore SRL4RL/ae/evalAE.py \
@@ -166,7 +166,7 @@ This will produce 'logsRL/hashCode' folder, where all the outputs are going to b
 
 ### *RL Policies Evaluation*
 
-To compute the episode returns averaged over 100 episodes (`--n_eval_traj 100`) with the best RL policy (`--model_type model_best`) after training, run:
+To compute the episode returns averaged over 100 episodes (`--n_eval_traj 100`) with the best RL policy (`--model_type model_best`) during/after training, run:
 ```bash
 dir=<RL_trained_model_path>
 mpirun -np 1 python -u -W ignore SRL4RL/rl/demo.py \
@@ -176,7 +176,7 @@ mpirun -np 1 python -u -W ignore SRL4RL/rl/demo.py \
 ```
 
 
-To record an evaluation video (`--save_video True`) and all image frames (`--save_image True`), with a good resolution (`--highRes True`), with the best RL policy (`--model_type model_best`) after training, run:
+To record an evaluation video (`--save_video True`) and all image frames (`--save_image True`), with a good resolution (`--highRes True`), with the best RL policy (`--model_type model_best`) during/after training, run:
 ```bash
 dir=<RL_trained_model_path>
 mpirun -np 1 python -u -W ignore SRL4RL/rl/demo.py \
@@ -187,7 +187,7 @@ mpirun -np 1 python -u -W ignore SRL4RL/rl/demo.py \
     --highRes True
 ```
 
-To view the policy after training, run:
+To view the policy during/after training, run:
 ```bash
 dir=<RL_trained_model_path>
 mpirun -np 1 python -u -W ignore SRL4RL/rl/demo.py \
