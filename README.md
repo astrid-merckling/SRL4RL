@@ -193,7 +193,7 @@ dir=<RL_trained_model_path>
 mpirun -np 1 python -u -W ignore SRL4RL/rl/demo.py \
     --dir $dir \
     --model_type model_best \
-    --render True
+    --renders True
 ```
 
 

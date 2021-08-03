@@ -69,8 +69,7 @@ class BulletWrapper(gym.Wrapper):
             obs = self.env.robot.measurement()
         elif self.method == 'openLoop':
             obs = np.array([self.env.envStepCounter // self.env.actionRepeat])
-
-        if self.with_images:
+        elif self.with_images:
             obs = renderPybullet(self.env, self.__dict__)
         return obs, reward, done, info
 
@@ -83,7 +82,6 @@ class BulletWrapper(gym.Wrapper):
             obs = self.env.robot.measurement()
         elif self.method == 'openLoop':
             obs = np.array([self.env.envStepCounter // self.env.actionRepeat])
-
-        if self.with_images:
+        elif self.with_images:
             obs = renderPybullet(self.env, self.__dict__)
         return obs        

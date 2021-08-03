@@ -26,14 +26,14 @@ class EmptyArgs: pass
 def eval_agent(args, env, o_mean, o_std, g_mean, g_std, actor_network, runner, video_path="", image_path=''):
     numSteps = int(args.max_episode_steps // args.actionRepeat)
     mean_rewardProgress = 0
-    if args.render and args.env_name in PY_MUJOCO:
+    if args.renders and args.env_name in PY_MUJOCO:
         env.render(mode='human')
     if args.env_name in ['TurtlebotEnv-v0', 'TurtlebotMazeEnv-v0']:
         "map view of the environment"
         camera_id_eval = 1
     else:
         "the default camera"
-        camera_id_eval = 0
+        camera_id_eval = -1 if args.highRes else 0
 
     camera_id = -1 if args.highRes else 0
     g, num_steps = 0, 0
@@ -163,7 +163,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_type', type=str, default="model_best", choices=(['model_last', 'model_best']), help='Whether to load the policy with best average return, or the last saved policy')
     parser.add_argument('--demo_length', type=int, default=2, help='The demo length')
     parser.add_argument('--n_eval_traj', type=int, default=0, help='The number of trajectories to compute the average episode returns')
-    parser.add_argument('--render', type=str2bool, default=False, help='Tune entropy')
+    parser.add_argument('--renders', type=str2bool, default=False, help='Tune entropy')
     parser.add_argument('--highRes', type=str2bool, default=True, help='Record high-resolution images, if True, do not downscale images')
     parser.add_argument('--cuda', type=str2bool, default=True, help='If False, do not use cuda if available')
     args_init = parser.parse_args()
@@ -185,7 +185,7 @@ if __name__ == '__main__':
     args = EmptyArgs()
     args.__dict__.update(config)
     "change args with args_init"
-    args.render = args_init.render
+    args.renders = args_init.renders
     args.dir = args_init.dir
     args.highRes = args_init.highRes
 
@@ -226,7 +226,7 @@ if __name__ == '__main__':
         saved_steps_per_episode = args.max_episode_steps
 
 
-    if args_init.save_video or args_init.save_image or args_init.render:
+    if args_init.save_video or args_init.save_image or args_init.renders:
         assert args_init.n_eval_traj == 0
         # Change max_episode_steps to define the Average step
         args.max_episode_steps = saved_steps_per_episode
@@ -257,7 +257,7 @@ if __name__ == '__main__':
         image_path = args.dir + '/piEval-best-E%s/' % config[
             'best_elapsed_epochs'] if args_init.model_type == "model_best" else args.dir + '/piEval-last-E%s/' % config[
             'last_elapsed_epochs']
-        createFolder(image_path, "piExplore2im already exist")
+        createFolder(image_path, image_path + " already exist")
     else:
         image_path = ""
 
