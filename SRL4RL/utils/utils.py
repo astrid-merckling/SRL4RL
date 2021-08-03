@@ -62,6 +62,9 @@ def give_name(config):
     elif model_name == 'AE':
         pass
 
+    if 'n_stack' in config:
+        if config['n_stack'] == 1 and config['actionRepeat'] > 1 and config['method'] != 'timeInput' and config['method'] != 'measurement':
+            model_name += ' (w/o image stack)'
     if 'agent' in config: # 'RL_name'
         model_name = 'SAC+'+ model_name
     if 'env_params' in config:
@@ -74,8 +77,8 @@ def give_name(config):
         if 'randomExplor' in config['SRL_name']:
             model_name += '-explor'
         if config['wallDistractor']:
-            model_name+=' (w.distractor)'
-    if '(w.distractor)' not in model_name:
+            model_name+=' (w/ distractor)'
+    if '(w/ distractor)' not in model_name and 'stack' not in model_name:
         model_name += ' (dim {})'.format(state_dim) if model_name == 'ground truth' else ' (dim %1d)' % (state_dim*factor)
     return model_name
 

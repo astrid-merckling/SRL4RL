@@ -125,7 +125,7 @@ for curr_path in paths:
     backprop_per_eval_dict[env_id] = backprop_per_eval
 
 # TODO: modify with current experiments
-list_order = ['ground truth', 'XSRL (d', 'XSRL (w.distractor)', 'XSRL-MaxEnt', 'XSRL-random','RAE-explor-stack','RAE-explor ','RAE-stack','RAE ',
+list_order = ['ground truth', 'XSRL (d', 'XSRL (w/ distractor)', 'XSRL-MaxEnt', 'XSRL-random','RAE-explor-stack','RAE-explor ','RAE-stack','RAE ',
               'VAE ', 'random network-','random network ','position- ','position ', 'open-loop','pure noise ']
 
 for env_id in data:
