@@ -305,7 +305,7 @@ def piExplore2obs(envExplor, noise_adder, alpha, beta, gamma, omega, pi_head, mu
         camera_id_eval = 1
         imLabel = 'map'
     else:
-        camera_id_eval = 0
+        camera_id_eval = -1
         imLabel = 'env'
     if eval:
         path_eval = os.path.join(save_dir, 'piExplore2obs{}/'.format(saved_step))

@@ -133,7 +133,7 @@ if args.env_name in ['TurtlebotEnv-v0', 'TurtlebotMazeEnv-v0']:
 
 elif args.env_name in PY_MUJOCO:
 
-    camera_id_eval = 0
+    camera_id_eval = -1
     imLabel = 'env'
     evalSteps = evalSteps
     "actionRepeat is done only one time"
