@@ -26,9 +26,8 @@ def loadPi(path, model_type = 'model_last', withQ=False):
 
 # process the inputs
 def process_inputs(o, g, o_mean, o_std, g_mean, g_std, config):
-    if config['method'] in state_baselines and config['method']!= 'openLoop':
-        if (np.abs(o) > 200).any():
-            print('\nstate is HUGE\n')
+    if (np.abs(o) > config['clip_obs']).any():
+        print('\nstate is HUGE\n')
         o = np.clip(o, -config['clip_obs'], config['clip_obs'])
     o_norm = np.clip((o - o_mean) / o_std, -config['clip_range'], config['clip_range'])
     inputs = o_norm
@@ -39,9 +38,9 @@ def process_inputs(o, g, o_mean, o_std, g_mean, g_std, config):
     return inputs
 
 def process_inputs_gt(o, g, o_mean, o_std, g_mean, g_std, clip_obs = 200, clip_range = 10, with_goal= False):
-    if (np.abs(o) > 200).any():
+    if (np.abs(o) > clip_obs).any():
         print('\nstate is HUGE\n')
-    o = np.clip(o, -clip_obs, clip_obs)
+        o = np.clip(o, -clip_obs, clip_obs)
     o_norm = np.clip((o - o_mean) / o_std, -clip_range, clip_range)
     inputs = o_norm
     if with_goal:
@@ -64,9 +63,8 @@ class Trainer():
 
     # pre_process the inputs
     def _preproc_inputs(self, obs, g=None, device=torch.device('cpu')):
-        if self.method in state_baselines and self.method!= 'openLoop':
-            if (np.abs(obs) > 200).any():
-                print('\nstate is HUGE\n')
+        if (np.abs(obs) > self.clip_obs).any():
+            print('\nstate is HUGE\n')
             obs = np.clip(obs, -self.clip_obs, self.clip_obs)
         obs_norm = self.o_norm.normalize(obs)
         if self.with_goal:
