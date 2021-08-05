@@ -62,10 +62,11 @@ if args.dir:
 
     dir_inverse = loaded_config['inverse']
     keep_keys += ['n_stack']
-    select_new_args = {k: loaded_config[k] for k in keep_keys}
     if args.keep_seed:
+        select_new_args = {k: args.__dict__[k] for k in remove_keys}
         loaded_config.update(select_new_args)
     else:
+        select_new_args = {k: loaded_config[k] for k in keep_keys}
         args.__dict__.update(select_new_args)
         del loaded_config
 
@@ -191,14 +192,14 @@ if args.keep_seed:
     config = loaded_config
 else:
     config = OrderedDict(sorted(args.__dict__.items()))
-    hashCode = hashlib.md5(json.dumps(config, sort_keys=True).encode()).hexdigest()
-    config['hashCode'] = hashCode
+    config['hashCode'] = hashlib.md5(json.dumps(config, sort_keys=True).encode()).hexdigest()
     config['date'] = datetime.now().strftime("%y-%m-%d_%Hh%M_%S")
-    env_params_name = config['new_env_name'] + ' ' + giveEnv_name(config)
     config['action_dim'] = action_dim
     config['device'] = device
     config['with_noise'] = with_noise
 
+hashCode = loaded_config['hashCode']
+env_params_name = config['new_env_name'] + ' ' + giveEnv_name(config)
 with_noise = args.noise_type != 'none'
 if with_noise:
     noise_adder = AddNoise(config)
