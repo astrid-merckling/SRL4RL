@@ -17,8 +17,9 @@ def loadPi(path, model_type = 'model_last', withQ=False):
     o_mean, o_std, g_mean, g_std, actor_network, critic_network = torch.load(os.path.join(path, model_type+'.pt'),
                                                              map_location=lambda storage, loc: storage)
     actor_network.eval()
-    print('Load Pi')
+    print('Load Pi: {}'.format(model_type))
     if withQ:
+        print('Load Q-network')
         critic_network.eval()
         return o_mean, o_std, g_mean, g_std, actor_network, critic_network
     else:
