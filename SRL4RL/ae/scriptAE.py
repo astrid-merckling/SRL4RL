@@ -58,13 +58,12 @@ if args.dir:
         keep_keys.remove(k)
 
     keep_keys += ['n_stack']
+
+    select_new_args = {k: loaded_config[k] for k in keep_keys}
+    args.__dict__.update(select_new_args)    
     if args.keep_seed:
         select_new_args = {k: args.__dict__[k] for k in remove_keys}
         loaded_config.update(select_new_args)
-    else:
-        select_new_args = {k: loaded_config[k] for k in keep_keys}
-        args.__dict__.update(select_new_args)
-        del loaded_config
 
     "force the Garbage Collector to release unreferenced memory"
     del select_new_args, keep_keys
@@ -310,7 +309,7 @@ if save_video:
         cv2.VideoWriter_fourcc(*'mp4v'), fps=5,
         frameSize=(args.image_size, args.image_size))
 
-if args.keep_seed:
+if args.dir:
     del loaded_config
     gc.collect()
 

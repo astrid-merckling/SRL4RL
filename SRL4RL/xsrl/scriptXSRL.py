@@ -62,13 +62,12 @@ if args.dir:
 
     dir_inverse = loaded_config['inverse']
     keep_keys += ['n_stack']
+
+    select_new_args = {k: loaded_config[k] for k in keep_keys}
+    args.__dict__.update(select_new_args)
     if args.keep_seed:
         select_new_args = {k: args.__dict__[k] for k in remove_keys}
         loaded_config.update(select_new_args)
-    else:
-        select_new_args = {k: loaded_config[k] for k in keep_keys}
-        args.__dict__.update(select_new_args)
-        del loaded_config
 
     "force the Garbage Collector to release unreferenced memory"
     del select_new_args, keep_keys
@@ -417,10 +416,9 @@ dones = [False] * args.num_envs
 envs_to_reset = np.array(dones, dtype=np.bool)
 reseted = np.arange(args.num_envs)[envs_to_reset]
 
-if args.keep_seed:
+if args.dir:
     del loaded_config
     gc.collect()
-
 
 "init state with obs without noise"
 if config['n_stack'] > 1:
