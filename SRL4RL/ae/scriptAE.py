@@ -53,17 +53,21 @@ if args.dir:
         else:
             all_dir = loaded_config['all_dir'] + '-' + dir_hashCode
 
-    eval_keys = list(args.__dict__.keys())
+    keep_keys = list(args.__dict__.keys())
     for k in remove_keys:
-        eval_keys.remove(k)
+        keep_keys.remove(k)
 
-    eval_keys += ['n_stack']
-    select_new_args = {k: loaded_config[k] for k in eval_keys}
-    args.__dict__.update(select_new_args)
+    keep_keys += ['n_stack']
+    if args.keep_seed:
+        select_new_args = {k: args.__dict__[k] for k in remove_keys}
+        loaded_config.update(select_new_args)
+    else:
+        select_new_args = {k: loaded_config[k] for k in keep_keys}
+        args.__dict__.update(select_new_args)
+        del loaded_config
 
     "force the Garbage Collector to release unreferenced memory"
-    del select_new_args, eval_keys
-    if not args.keep_seed:    del loaded_config
+    del select_new_args, keep_keys
     gc.collect()
 
 maxStep_eval = 500
@@ -169,14 +173,14 @@ if args.keep_seed:
     config = loaded_config
 else:
     config = OrderedDict(sorted(args.__dict__.items()))
-    hashCode = hashlib.md5(json.dumps(config, sort_keys=True).encode()).hexdigest()
-    config['hashCode'] = hashCode
+    config['hashCode'] = hashlib.md5(json.dumps(config, sort_keys=True).encode()).hexdigest()
     config['date'] = datetime.now().strftime("%y-%m-%d_%Hh%M_%S")
-    env_params_name = config['new_env_name'] + ' ' + giveEnv_name(config)
     config['action_dim'] = action_dim
     config['device'] = device
     config['with_noise'] = with_noise
 
+hashCode = config['hashCode']
+env_params_name = config['new_env_name'] + ' ' + giveEnv_name(config)
 with_noise = args.noise_type != 'none'
 if with_noise:
     noise_adder = AddNoise(config)
