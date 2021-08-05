@@ -15,8 +15,9 @@ class sac_agent(Agent):
     def __init__(self, config, env, env_params, runner):
         # create the network
         if config['dir']:
+            suffix = '_last' if 'last_eval' in config else '_best'
             config['o_mean'], config['o_std'], config['g_mean'], config[
-                'g_std'], self.actor_network, self.critic_network = loadPi(config['dir'], withQ=True)
+                'g_std'], self.actor_network, self.critic_network = loadPi(config['dir'], model_type = 'model' + suffix, withQ=True)
             self.actor_network.train(), self.critic_network.train()
         else:
             self.actor_network = GaussianPolicy(env_params, config)
