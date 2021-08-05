@@ -41,28 +41,28 @@ if args.dir:
     if args.dir[-1] != '/': args.dir += '/'
     loaded_config = loadConfig(args.dir)
     dir_hashCode = loaded_config['hashCode']
-    keep_keys = ['keep_seed', 'dir', 'debug','patience', 'n_epochs']
+    remove_keys = ['keep_seed', 'dir', 'debug','patience', 'n_epochs']
     if args.keep_seed:
         assert loaded_config['hashCode'] == dir_hashCode
         if 'all_dir' in loaded_config:
             all_dir = loaded_config['all_dir']
     else:
-        keep_keys += ['logs_dir', 'seed', 'noise_type','lr', 'patience']
+        remove_keys += ['logs_dir', 'seed', 'noise_type','lr', 'patience']
         if 'all_dir' not in loaded_config:
             all_dir = dir_hashCode
         else:
             all_dir = loaded_config['all_dir'] + '-' + dir_hashCode
 
     eval_keys = list(args.__dict__.keys())
-    for k in keep_keys:
+    for k in remove_keys:
         eval_keys.remove(k)
 
     eval_keys += ['n_stack']
-    select_eval_args = {k: loaded_config[k] for k in eval_keys}
-    args.__dict__.update(select_eval_args)
+    select_new_args = {k: loaded_config[k] for k in eval_keys}
+    args.__dict__.update(select_new_args)
 
     "force the Garbage Collector to release unreferenced memory"
-    del select_eval_args, eval_keys
+    del select_new_args, eval_keys
     if not args.keep_seed:    del loaded_config
     gc.collect()
 
@@ -165,24 +165,24 @@ envEval = BulletWrapper(envEval, args.__dict__)
 action_dim = envEval.action_space.shape[0]
 
 "Create config"
-config = OrderedDict(sorted(args.__dict__.items()))
-
 if args.keep_seed:
-    hashCode = loaded_config['hashCode']
+    config = loaded_config
 else:
+    config = OrderedDict(sorted(args.__dict__.items()))
     hashCode = hashlib.md5(json.dumps(config, sort_keys=True).encode()).hexdigest()
+    config['hashCode'] = hashCode
+    config['date'] = datetime.now().strftime("%y-%m-%d_%Hh%M_%S")
+    env_params_name = config['new_env_name'] + ' ' + giveEnv_name(config)
+    config['action_dim'] = action_dim
+    config['device'] = device
+    config['with_noise'] = with_noise
 
 with_noise = args.noise_type != 'none'
 if with_noise:
     noise_adder = AddNoise(config)
 else:
     noise_adder = None
-config['hashCode'] = hashCode
-config['date'] = datetime.now().strftime("%y-%m-%d_%Hh%M_%S")
-env_params_name = config['new_env_name'] + ' ' + giveEnv_name(config)
-config['action_dim'] = action_dim
-config['device'] = device
-config['with_noise'] = with_noise
+
 
 if all_dir:
     config['all_dir'] = all_dir
