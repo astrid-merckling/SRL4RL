@@ -142,11 +142,6 @@ class StateRunner(Runner):
         else:
             self.noise_adder = None
 
-        if config['actionRepeat'] > 1:
-            self.datasetEval_path = os.path.join(SRL4RL_path,
-                                                 'testDatasets/testDataset_{}_noRepeatAction.pkl'.format(config['new_env_name']))
-        else:
-            self.datasetEval_path = os.path.join(SRL4RL_path, 'testDatasets/testDataset_{}.pkl'.format(config['new_env_name']))
         self.noiseParams = {'with_noise': self.with_noise, 'flickering': config['flickering']}
 
 

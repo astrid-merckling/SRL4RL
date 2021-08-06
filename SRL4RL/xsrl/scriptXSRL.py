@@ -195,11 +195,11 @@ else:
     config['date'] = datetime.now().strftime("%y-%m-%d_%Hh%M_%S")
     config['action_dim'] = action_dim
     config['device'] = device
-    config['with_noise'] = with_noise
+    config['with_noise'] = args.noise_type != 'none'
 
 hashCode = loaded_config['hashCode']
 env_params_name = config['new_env_name'] + ' ' + giveEnv_name(config)
-with_noise = args.noise_type != 'none'
+with_noise = config['with_noise']
 if with_noise:
     noise_adder = AddNoise(config)
 else:

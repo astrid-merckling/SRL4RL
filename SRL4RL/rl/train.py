@@ -40,7 +40,6 @@ if __name__ == '__main__':
     # get the args
     args = get_args()
     "first change args with respect to the env"
-    args = update_args_RL(args)
 
     if args.seed == 123456:
         args.seed = datetime.now().microsecond
@@ -67,6 +66,7 @@ if __name__ == '__main__':
         "Cannot learn from images without SRL model!"
         args = load_config(args)
 
+    args = update_args_RL(args)
     args = assert_args_RL(args)
 
 
