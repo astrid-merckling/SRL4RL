@@ -197,7 +197,7 @@ else:
     config['device'] = device
     config['with_noise'] = args.noise_type != 'none'
 
-hashCode = loaded_config['hashCode']
+hashCode = config['hashCode']
 env_params_name = config['new_env_name'] + ' ' + giveEnv_name(config)
 with_noise = config['with_noise']
 if with_noise:
