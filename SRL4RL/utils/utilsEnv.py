@@ -65,7 +65,7 @@ def update_args_envs(args):
         # TODO: uncomment below line
         args.n_stack = 3 if args.actionRepeat > 1 else 1
         # TODO: comment below line
-        # if args.actionRepeat == 1 and args.method!= 'XSRL': args.n_stack = 3
+        if args.actionRepeat == 1 and args.method!= 'XSRL': args.n_stack = 3
 
     return args
 
