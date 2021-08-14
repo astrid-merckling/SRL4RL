@@ -189,7 +189,7 @@ if __name__ == '__main__':
     args.dir = args_init.dir
     args.highRes = args_init.highRes
 
-    args.seed = 0 # datetime.now().microsecond
+    args.seed = datetime.now().microsecond
     print('\nSeed is : \n', args.seed)
     "IMPORTANT TO USE FOR CUDA MEMORY"
     set_seeds(args.seed)
@@ -240,8 +240,8 @@ if __name__ == '__main__':
     """
     args.srl_path = args_init.dir
     args.demo = True
-    args.distractor = True
-    args.noise_type = 'noisyObs'
+    # args.distractor = True
+    # args.noise_type = 'noisyObs'
     env, _, runner = make_env(args.__dict__)
     env.seed(args.seed)
 
