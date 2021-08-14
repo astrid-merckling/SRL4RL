@@ -95,7 +95,7 @@ def eval_agent(args, env, o_mean, o_std, g_mean, g_std, actor_network, runner, v
                     update_video(env, im=None, color=args.color, video_size=image_size,
                                  video=video_out, fpv=args.fpv, camera_id=camera_id,downscaling=not args.highRes)
             if image_path:
-                im_high_render = render_env(env, 588, False, camera_id_eval, args.color, downscaling=False)
+                im_high_render = render_env(env, 588, False, camera_id_eval, args.color, downscaling=not args.highRes)
                 cv2.imwrite(image_path + 'ob_{:05d}'.format(num_steps) + '.png',
                             im_high_render[:, :, ::-1].astype(np.uint8))
 
@@ -189,7 +189,7 @@ if __name__ == '__main__':
     args.dir = args_init.dir
     args.highRes = args_init.highRes
 
-    args.seed = datetime.now().microsecond
+    args.seed = 0 # datetime.now().microsecond
     print('\nSeed is : \n', args.seed)
     "IMPORTANT TO USE FOR CUDA MEMORY"
     set_seeds(args.seed)
