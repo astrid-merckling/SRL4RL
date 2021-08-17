@@ -240,6 +240,7 @@ if __name__ == '__main__':
     """
     args.srl_path = args_init.dir
     args.demo = True
+    # args.random_target = False
     # args.distractor = True
     # args.noise_type = 'noisyObs'
     env, _, runner = make_env(args.__dict__)

@@ -394,6 +394,7 @@ def resize_3Dfig(ax, data):
     data2plotXmin, data2plotXmax = min(data[:, 0]), max(data[:, 0])
     data2plotYmin, data2plotYmax = min(data[:, 1]), max(data[:, 1])
     data2plotZmin, data2plotZmax = min(data[:, 2]), max(data[:, 2])
+
     ax.set_xlim(data2plotXmin, data2plotXmax)
     ax.set_ylim(data2plotYmin, data2plotYmax)
     ax.set_zlim(data2plotZmin, data2plotZmax)
