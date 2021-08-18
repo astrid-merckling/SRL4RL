@@ -133,9 +133,9 @@ mpirun -np 1 python -u -W ignore SRL4RL/ae/evalAE.py \
 ```
 
 
-## Representations Transfer Evaluation with Reinforcement Learning
+## Representations Transfer with Reinforcement Learning
 
-In order to perform a quantitative evaluation of state estimators pretrained with our algorithm (XSRL) or other baselines, we validate the effectiveness of state inputs in RL systems to solve unseen control tasks.
+In order to perform a quantitative evaluation of state estimators pretrained with our algorithm (XSRL) or other baselines, we validate the effectiveness of state representations as inputs to RL systems to solve unseen control tasks.
 To do so, we use the deep RL algorithm SAC ([Soft Actor-Critic](https://arxiv.org/pdf/1812.05905.pdf)), which has shown promising results on the standard continuous control tasks `InvertedPendulum` and `HalfCheetah`.
 The SAC implementation is based on [pytorch-soft-actor-critic](https://github.com/pranz24/pytorch-soft-actor-critic).
 
@@ -205,7 +205,7 @@ The results are presented succinctly in [Project Page](https://www.astrid-merckl
 # Credits
 
 Astrid Merckling: designed the proposed algorithm, implemented the experiments, and also wrote the article.
-Stéphane Doncieux, Alexandre Coninx and Nicolas Perrin: supervised the project and provided guidance and feedback, and also helped with the writing of the article.
+Stéphane Doncieux, Alexandre Coninx and Nicolas Perrin-Gilbert: supervised the project and provided guidance and feedback, and also helped with the writing of the article.
 
 ```
 TODO bibtex citation
