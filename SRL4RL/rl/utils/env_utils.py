@@ -22,7 +22,7 @@ def load_config(args):
     option = 'RL' if 'n_eval_rollouts' in srl_config else 'SRL'
 
     SRL_args = ['method', 'n_stack', 'image_size', 'env_name', 'fpv', 'state_dim', 'color',
-                'noise_type', 'activation', 'wallDistractor', 'actionRepeat']
+                'noise_type', 'activation', 'wallDistractor', 'actionRepeat','distractor']
 
     select_SRL_args = {k: srl_config[k] for k in SRL_args}
     args.__dict__.update(select_SRL_args)
