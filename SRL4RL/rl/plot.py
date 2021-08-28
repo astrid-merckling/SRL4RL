@@ -68,6 +68,13 @@ for curr_path in paths:
         continue
 
     env_id = config['new_env_name']
+
+    if config['hashCode'] not in [
+
+    ]:
+        continue
+    print('hashCode', config['hashCode'])
+
     model_name = give_name(config)
     if args.verbose:
         print('\ncurr_path: {}, \nhashCode: {}, method: {}, model_name: {}'.format(curr_path, config['hashCode'],
