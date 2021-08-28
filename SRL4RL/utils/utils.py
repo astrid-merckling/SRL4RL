@@ -62,9 +62,13 @@ def give_name(config):
     elif model_name == 'AE':
         pass
 
-    if 'n_stack' in config:
-        if config['n_stack'] == 1 and config['actionRepeat'] > 1 and config['method'] != 'timeInput' and config['method'] != 'measurement':
-            model_name += ' (w/o image stack)'
+    if 'n_stack' in config and config['method'] not in state_baselines:
+        # if config['n_stack'] == 1 and config['actionRepeat'] > 1 and config['method'] != 'openLoop' and config['method'] != 'measurement':
+        #     model_name += ' (w/o stack)'
+        if config['n_stack'] == 1 :
+            model_name += ' (w/o stack)'      
+        elif config['n_stack'] > 1 :
+            model_name += ' (w/ stack)'                        
     if 'agent' in config: # 'RL_name'
         model_name = 'SAC+'+ model_name
     if 'env_params' in config:
@@ -74,7 +78,7 @@ def give_name(config):
     if config['method'] in encoder_methods:
         if config['stack_state']:
             model_name += '-stack'
-        if 'randomExplor' in config['SRL_name']:
+        if 'randomExplor' in config['SRL_name'] and '(w/o stack)' not in model_name:
             model_name += '-explor'
         if config['wallDistractor']:
             model_name+=' (w/ distractor)'

@@ -65,7 +65,7 @@ def update_args_envs(args):
         # TODO: uncomment below line
         args.n_stack = 3 if args.actionRepeat > 1 else 1
         # TODO: comment below line
-        # if args.actionRepeat == 1 and args.method!= 'XSRL': args.n_stack = 3
+        if args.actionRepeat == 1 and args.method!= 'XSRL': args.n_stack = 3
 
     return args
 
@@ -137,7 +137,6 @@ def update_video(env=None, im=None, step=0, color=True, camera_id=0, video_size=
         cv2.imwrite(save_dir + 'ob_%05d' % (step) + '.png', new_im)
     if video is not None:
         video.write(new_im)
-
 
 def load_cifar10(file):
     """load the cifar-10 data"""
