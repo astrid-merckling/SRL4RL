@@ -169,6 +169,7 @@ action_dim = envEval.action_space.shape[0]
 "Create config"
 if args.keep_seed:
     config = loaded_config
+    config['maxStep'] = args.maxStep
 else:
     config = OrderedDict(sorted(args.__dict__.items()))
     config['hashCode'] = hashlib.md5(json.dumps(config, sort_keys=True).encode()).hexdigest()
