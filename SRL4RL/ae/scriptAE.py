@@ -58,7 +58,6 @@ if args.dir:
         loaded_config.update(select_new_args)
     else:
         keep_keys = list(args.__dict__.keys())
-        print(keep_keys)
         for k in remove_keys:
             keep_keys.remove(k)
         keep_keys += ['n_stack']
