@@ -100,6 +100,9 @@ with_discoveryPi = is_with_discoveryPi(args.__dict__)
 np2torch = lambda x: numpy2pytorch(x, differentiable=False, device=cpu)
 np2torchDev = lambda x: numpy2pytorch(x, differentiable=False, device=device)
 
+if args.evalExplor:
+    "to eval on a max of 500 steps"
+    maxSteps -= args.num_envs
 
 if args.maxStep == np.inf:
     maxSteps = [args.maxStep] * args.num_envs
