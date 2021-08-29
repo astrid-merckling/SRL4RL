@@ -55,6 +55,7 @@ if args.dir:
 
     keep_keys = list(args.__dict__.keys())
     for k in remove_keys:
+        print(k)
         keep_keys.remove(k)
 
     keep_keys += ['n_stack']
