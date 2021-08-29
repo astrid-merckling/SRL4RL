@@ -97,7 +97,6 @@ if args.randomExplor:
         args.maxStep = 250
     elif args.env_name == 'HalfCheetahBulletEnv-v0':
         args.maxStep = 250
-    args.maxStep -= (args.num_envs - 1)
 
 if args.maxStep == np.inf:
     maxSteps = [args.maxStep] * args.num_envs

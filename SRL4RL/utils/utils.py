@@ -62,13 +62,11 @@ def give_name(config):
     elif model_name == 'AE':
         pass
 
-    if 'n_stack' in config and config['method'] not in state_baselines:
-        # if config['n_stack'] == 1 and config['actionRepeat'] > 1 and config['method'] != 'openLoop' and config['method'] != 'measurement':
-        #     model_name += ' (w/o stack)'
-        if config['n_stack'] == 1 :
-            model_name += ' (w/o stack)'      
-        elif config['n_stack'] > 1 :
-            model_name += ' (w/ stack)'                        
+    # if 'n_stack' in config and config['method'] not in state_baselines:
+    #     if config['n_stack'] == 1 :
+    #         model_name += ' (w/o stack)'      
+    #     elif config['n_stack'] > 1 :
+    #         model_name += ' (w/ stack)'                        
     if 'agent' in config: # 'RL_name'
         model_name = 'SAC+'+ model_name
     if 'env_params' in config:

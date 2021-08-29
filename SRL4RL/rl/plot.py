@@ -69,11 +69,10 @@ for curr_path in paths:
 
     env_id = config['new_env_name']
 
-    if config['hashCode'] not in [
-
-    ]:
-        continue
-    print('hashCode', config['hashCode'])
+    # if config['hashCode'] not in [
+    # ]:
+    #     continue
+    # print('hashCode', config['hashCode'])
 
     model_name = give_name(config)
     if args.verbose:
@@ -93,7 +92,7 @@ for curr_path in paths:
     y = success_rate
     if args.smooth:
         # TODO: modify with current experiments
-        if env_id == 'TurtlebotMazeEnv':
+        if env_id in ['TurtlebotMazeEnv', 'ReacherBulletEnv']:
             kernel_size = 10
             print('moving_avg_curve')
             x, y = moving_avg_curve(x, kernel_size=kernel_size), moving_avg_curve(y, kernel_size=kernel_size)
@@ -110,6 +109,9 @@ for curr_path in paths:
     elif env_id == 'TurtlebotMazeEnv':
         y_min, y_max = 0, 1
         step_limit = 2700000
+    elif env_id == 'ReacherBulletEnv':
+        y_min, y_max = 0, 1
+        step_limit = 2600000
     y = (y - y_min) / (y_max - y_min)
 
     if step_limit:
