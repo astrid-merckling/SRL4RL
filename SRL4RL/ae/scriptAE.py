@@ -41,13 +41,13 @@ if args.dir:
     if args.dir[-1] != '/': args.dir += '/'
     loaded_config = loadConfig(args.dir)
     dir_hashCode = loaded_config['hashCode']
-    remove_keys = ['keep_seed', 'dir', 'debug','patience', 'n_epochs']
+    remove_keys = ['debug', 'dir','keep_seed', 'n_epochs', 'patience']
     if args.keep_seed:
         assert loaded_config['hashCode'] == dir_hashCode
         if 'all_dir' in loaded_config:
             all_dir = loaded_config['all_dir']
     else:
-        remove_keys += ['logs_dir', 'seed', 'noise_type','lr', 'patience']
+        remove_keys += ['logs_dir','lr', 'noise_type' ,'seed',]
         if 'all_dir' not in loaded_config:
             all_dir = dir_hashCode
         else:
