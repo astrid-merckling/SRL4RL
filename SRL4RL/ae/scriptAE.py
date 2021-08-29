@@ -187,8 +187,8 @@ else:
     noise_adder = None
 
 
-if all_dir:
-    config['all_dir'] = all_dir
+if all_dir: config['all_dir'] = all_dir
+if args.keep_seed:
     save_path = args.dir
 else:
     save_path = os.path.join(SRL4RL_path, args.logs_dir)
