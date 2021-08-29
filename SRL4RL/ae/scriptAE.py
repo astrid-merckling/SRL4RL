@@ -56,16 +56,17 @@ if args.dir:
     if args.keep_seed:
         select_new_args = {k: args.__dict__[k] for k in remove_keys}
         loaded_config.update(select_new_args)
+        del select_new_args
     else:
         keep_keys = list(args.__dict__.keys())
         for k in remove_keys:
             keep_keys.remove(k)
         keep_keys += ['n_stack']
         select_old_args = {k: loaded_config[k] for k in keep_keys}
-        args.__dict__.update(select_old_args)           
+        args.__dict__.update(select_old_args)
+        del keep_keys, select_old_args
 
     "force the Garbage Collector to release unreferenced memory"
-    del select_new_args, keep_keys
     gc.collect()
 
 maxStep_eval = 500
