@@ -102,7 +102,7 @@ np2torchDev = lambda x: numpy2pytorch(x, differentiable=False, device=device)
 
 if args.evalExplor:
     "to eval on a max of 500 steps"
-    maxSteps -= args.num_envs
+    args.maxStep -= args.num_envs
 
 if args.maxStep == np.inf:
     maxSteps = [args.maxStep] * args.num_envs
