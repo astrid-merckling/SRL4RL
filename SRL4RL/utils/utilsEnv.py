@@ -40,10 +40,11 @@ def update_args_envs(args):
     if 'Turtlebot' in args.env_name:
         args.fpv = True
 
-    if 'Turtlebot' in args.env_name:
-        args.bumpDetection = True
-    else:
-        args.bumpDetection = False
+    args.bumpDetection = False
+    # if 'Turtlebot' in args.env_name:
+    #     args.bumpDetection = True
+    # else:
+    #     args.bumpDetection = False
 
     if args.env_name in PY_MUJOCO:
         if 'with_reset' in args.__dict__:
