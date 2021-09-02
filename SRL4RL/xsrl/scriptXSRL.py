@@ -61,6 +61,7 @@ if args.dir:
         select_new_args = {k: args.__dict__[k] for k in remove_keys}
         loaded_config.update(select_new_args)
         del select_new_args
+        print(args.__dict__)
     else:
         keep_keys = list(args.__dict__.keys())
         for k in remove_keys:
