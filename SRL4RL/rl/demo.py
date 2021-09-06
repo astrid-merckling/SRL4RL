@@ -203,8 +203,7 @@ if __name__ == '__main__':
         o_mean, o_std, g_mean, g_std, actor_network, _ = torch.load(
             args_init.dir + '/{}.pt'.format(args_init.model_type), map_location=lambda storage, loc: storage)
     except:
-        assert args_init.model_type == 'model_best', 'model_last.pt missing!'
-        print('\nNot model.pt saved')
+        print('\nNot {}.pt saved'.format(args_init.model_type))
         exit()
 
     actor_network.eval()

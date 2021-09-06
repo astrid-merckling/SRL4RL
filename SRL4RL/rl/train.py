@@ -52,7 +52,6 @@ if __name__ == '__main__':
 
         select_new_args = {k: args.__dict__[k] for k in keep_keys}
         config.update(select_new_args)
-        config['random_buffer'] = False
         if config['srl_path']:
             "update srl_path"
             config['srl_path'] = args.dir
