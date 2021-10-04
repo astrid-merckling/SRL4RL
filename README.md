@@ -206,7 +206,7 @@ mpirun -np 1 python -u -W ignore SRL4RL/rl/demo.py \
 
 ## Results
 
-The results are presented succinctly in [Project Page](https://www.astrid-merckling.com/publication/xsrl/), for a more complete presentation and explanation of our experiments see our [Paper](https://arxiv.org/pdf/2109.13596.pdf) and the [XSRL chapter](https://youtu.be/bv01X2peShU?t=1300) of my PhD Defense Presentation.
+The results are presented succinctly in [Project Page](https://www.astrid-merckling.com/publication/xsrl/), for a more complete presentation and explanation of our experiments see [Paper](https://arxiv.org/pdf/2109.13596.pdf) and [XSRL chapter](https://youtu.be/bv01X2peShU?t=1300) of my PhD Defense Presentation.
 
 
 # Credits
