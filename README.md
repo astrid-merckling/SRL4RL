@@ -2,9 +2,9 @@
 
 
 # XSRL (eXploratory State Representation Learning)
-[[Project Page]](https://www.astrid-merckling.com/publication/xsrl/)
-[[Watch a presentation]](https://youtu.be/bv01X2peShU?t=1301)
 [[Paper]](https://arxiv.org/pdf/2109.13596.pdf)
+[[Project Page]](https://www.astrid-merckling.com/publication/xsrl/)
+[[Watch a presentation]](https://youtu.be/bv01X2peShU?t=1300)
 
 
 This is the official PyTorch implementation of the paper titled "**Exploratory State Representation Learning**". \
@@ -22,7 +22,7 @@ If you find this useful for your research, please use the following citation.
 
 XSRL is a *state representation learning (SRL)* method which consists in pretraining state representation models from image observations, in a reward-free environment.
 Unlike the SRL methods developed so far, none has yet developed an exploration strategy as our method does.
-For more details on the contributions made with XSRL, see [Project Page](https://www.astrid-merckling.com/publication/xsrl/) or [Paper](TODO).
+For more details on the contributions made with XSRL, see [Project Page](https://www.astrid-merckling.com/publication/xsrl/) or [Paper](https://arxiv.org/pdf/2109.13596.pdf).
 
 
 # Getting started
@@ -206,7 +206,7 @@ mpirun -np 1 python -u -W ignore SRL4RL/rl/demo.py \
 
 ## Results
 
-The results are presented succinctly in [Project Page](https://www.astrid-merckling.com/publication/xsrl/), for a more complete presentation and explanation of our experiments see [Paper](TODO).
+The results are presented succinctly in [Project Page](https://www.astrid-merckling.com/publication/xsrl/), for a more complete presentation and explanation of our experiments see [Paper](https://arxiv.org/pdf/2109.13596.pdf).
 
 
 # Credits
