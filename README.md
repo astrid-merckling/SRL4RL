@@ -3,14 +3,21 @@
 
 # XSRL (eXploratory State Representation Learning)
 [[Project Page]](https://www.astrid-merckling.com/publication/xsrl/)
-[[Watch a presentation]](TODO)
-[[Paper]](TODO)
+[[Watch a presentation]](https://youtu.be/bv01X2peShU?t=1301)
+[[Paper]](https://arxiv.org/pdf/2109.13596.pdf)
 
 
 This is the official PyTorch implementation of the paper titled "**Exploratory State Representation Learning**". \
 If you find this useful for your research, please use the following citation.
 ```
-TODO bibtex
+@misc{merckling2021exploratory,
+      title={Exploratory State Representation Learning}, 
+      author={Astrid Merckling and Nicolas Perrin-Gilbert and Alexandre Coninx and Stéphane Doncieux},
+      year={2021},
+      eprint={2109.13596},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+}
 ```
 
 XSRL is a *state representation learning (SRL)* method which consists in pretraining state representation models from image observations, in a reward-free environment.
@@ -208,5 +215,12 @@ Astrid Merckling: designed the proposed algorithm, implemented the experiments, 
 Stéphane Doncieux, Alexandre Coninx and Nicolas Perrin-Gilbert: supervised the project and provided guidance and feedback, and also helped with the writing of the article.
 
 ```
-TODO bibtex citation
+@misc{merckling2021exploratory,
+      title={Exploratory State Representation Learning}, 
+      author={Astrid Merckling and Nicolas Perrin-Gilbert and Alexandre Coninx and Stéphane Doncieux},
+      year={2021},
+      eprint={2109.13596},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+}
 ```
