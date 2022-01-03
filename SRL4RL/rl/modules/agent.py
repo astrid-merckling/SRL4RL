@@ -256,7 +256,7 @@ class Agent(Saver):
                             self.alpha_sum = 0
                         print('  end RL evaluation')
                     self.elapsed_epochs += 1
-                if MPI.COMM_WORLD.Get_rank() == 0:
+
                     if self.early_stopper.early_stop:
                         self.config['early_stop'] = True
                         "Save last models"

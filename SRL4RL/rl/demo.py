@@ -275,5 +275,5 @@ if __name__ == '__main__':
         config[prefix + 'avg-progress'] = mean_rewardProgress if mean_rewardProgress != 0 else ''
         config[prefix + 'avg-steps'] = average_steps
         saveConfig(config, save_dir=args.dir)
-        with open(os.path.join(args.dir,'config.json'), 'w') as outfile:
+        with open(os.path.join(args.dir,'exp_config.json'), 'w') as outfile:
             json.dump(config, outfile)
