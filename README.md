@@ -40,7 +40,7 @@ For more details on the contributions made with XSRL, see [Project Page](https:/
 cd <installation_path_of_your_choice>
 git clone https://github.com/astrid-merckling/bullet_envs.git
 cd bullet_envs
-export PYTHONPATH=$(pwd):${PYTHONPATH}
+export PYTHONPATH=$PYTHONPATH:$(pwd)
 ```
 
 2. Clone this repo and have its path added to your `PYTHONPATH` environment variable:
@@ -48,7 +48,7 @@ export PYTHONPATH=$(pwd):${PYTHONPATH}
 cd <installation_path_of_your_choice>
 git clone https://github.com/astrid-merckling/SRL4RL.git
 cd SRL4RL
-export PYTHONPATH=$(pwd):${PYTHONPATH}
+export PYTHONPATH=$PYTHONPATH:$(pwd)
 ```
 
 3. Create and activate conda environment:
