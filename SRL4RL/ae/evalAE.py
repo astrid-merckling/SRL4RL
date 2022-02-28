@@ -1,14 +1,14 @@
-import torch
-from datetime import datetime
 import argparse
+from datetime import datetime
 
-from SRL4RL.utils.utils import loadConfig, str2bool
-from SRL4RL.utils.nn_torch import set_seeds
+import torch
+
 from SRL4RL.ae.utils import AE_nextObsEval
-
+from SRL4RL.utils.nn_torch import set_seeds
+from SRL4RL.utils.utils import loadConfig, str2bool
 
 parser = argparse.ArgumentParser(description="State representation learning new method")
-parser.add_argument("--dir", type=str, default="", help="Model path")
+parser.add_argument("--my_dir", type=str, default="", help="Model path")
 parser.add_argument("--debug", type=int, default=0, help="1 for debugging")
 parser.add_argument("--renders", type=str2bool, default=False, help="")
 args = parser.parse_args()
@@ -19,10 +19,10 @@ if not debug:
 
     matplotlib.use("Agg")
 
-dir = args.dir
-if dir[-1] != "/":
-    dir += "/"
-config = loadConfig(dir, name="exp_config")
+my_dir = args.my_dir
+if my_dir[-1] != "/":
+    my_dir += "/"
+config = loadConfig(my_dir, name="exp_config")
 
 device = torch.device("cpu")
 config["device"] = "cpu"
@@ -32,13 +32,15 @@ if "n_stack" not in config:
 
 args.__dict__.update(config)
 
-encoder = torch.load(dir + "state_model.pt", map_location=torch.device(device))
+encoder = torch.load(my_dir + "state_model.pt", map_location=torch.device(device))
 if args.method == "VAE":
     decoder, _ = torch.load(
-        dir + "state_model_tail.pt", map_location=torch.device(device)
+        my_dir + "state_model_tail.pt", map_location=torch.device(device)
     )
 else:
-    decoder = torch.load(dir + "state_model_tail.pt", map_location=torch.device(device))
+    decoder = torch.load(
+        my_dir + "state_model_tail.pt", map_location=torch.device(device)
+    )
 
 encoder.eval(), decoder.eval()
 
@@ -47,4 +49,6 @@ print("seed for evaluation is: {}".format(seed_testDataset))
 "IMPORTANT TO USE FOR CUDA MEMORY"
 set_seeds(seed_testDataset)
 
-nextObsEval = AE_nextObsEval(encoder, decoder, config, dir, suffix="eval", debug=debug)
+nextObsEval = AE_nextObsEval(
+    encoder, decoder, config, my_dir, suffix="evaluate", debug=debug
+)

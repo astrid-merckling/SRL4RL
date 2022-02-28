@@ -1,11 +1,10 @@
 import argparse
 
-from bullet_envs.utils import PYBULLET_ENV, NOISES
+import numpy as np
+from bullet_envs.utils import NOISES, PYBULLET_ENV
 
 from SRL4RL.utils.utils import str2bool
-from SRL4RL.utils.utilsEnv import update_args_envs, assert_args_envs
-import numpy as np
-
+from SRL4RL.utils.utilsEnv import assert_args_envs, update_args_envs
 
 """
 Here are the params for training XSRL models
@@ -37,17 +36,20 @@ def get_args():
         "--seed", type=int, default=123456, help="Random seed to use"
     )  # 123456
     parser.add_argument(
-        "--keep_seed", type=str2bool, default=False, help="only with dir"
+        "--keep_seed", type=str2bool, default=False, help="only with my_dir"
     )
     "Loading pretrained models"
     parser.add_argument(
-        "--dir", type=str, default="", help="path of the pretrained model to initialize"
+        "--my_dir",
+        type=str,
+        default="",
+        help="path of the pretrained model to initialize",
     )
     parser.add_argument(
         "--reset_policy",
         type=str2bool,
         default=False,
-        help="only with dir: reset policy",
+        help="only with my_dir: reset policy",
     )
     "Environment hyper-parameters"
     parser.add_argument(
@@ -128,7 +130,7 @@ def get_args():
         default=0.1,
         help="init entropy coefficient for autoEntropyTuning (Temperature parameter α determines the relative importance of the entropy term against the reward)",
     )
-    "NN hyper-parameters : (alpha, beta, gamma)"
+    "NN hyper-parameters: (alpha, beta, gamma)"
     parser.add_argument(
         "--activation",
         default="leaky_relu",
@@ -215,9 +217,9 @@ def assert_args_XSRL(args):
     assert_args_envs(args)
 
     if args.reset_policy:
-        assert args.dir, "reset_policy without --dir"
+        assert args.my_dir, "reset_policy without --my_dir"
     if args.keep_seed:
-        assert args.dir
+        assert args.my_dir
 
     args.nEnv_perPi = args.num_envs
 

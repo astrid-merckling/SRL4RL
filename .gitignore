@@ -6,7 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
-# SRL4RL 
+# SRL4RL
+*.yaml
 *scripts*
 *pyc
 *.pytorch

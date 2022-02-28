@@ -1,8 +1,8 @@
-import torch
-from torch.autograd import Variable
-import numpy as np
 import random
 
+import numpy as np
+import torch
+from torch.autograd import Variable
 
 layers_alpha = [
     ("/", 2, 32),

@@ -1,14 +1,15 @@
+import colorsys
 import os
+import traceback
+
+import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+import umap  # to import after sklearn!
+from bullet_envs import bullet_envs_path
 from mpl_toolkits.mplot3d import Axes3D
-import colorsys
 from PIL import Image
 from sklearn import decomposition
-import cv2
-import umap  # to import after sklearn!
-
-from bullet_envs import bullet_envs_path
 
 
 def plotter(
@@ -95,8 +96,9 @@ def visualizeMazeExplor(
             dpi=my_dpi,
         )
         plt.close()
-    except:
+    except Exception:
         print("  Bug while saving in visualizeMazeExplor")
+        traceback.print_exc()
         plt.close()
 
 
@@ -113,7 +115,7 @@ def plot_xHat(
     with_noise=False,
     with_nextObs=False,
     suffix="last",
-    eval=False,
+    evaluate=False,
 ):
     im_size = 256
     color = img.shape[-1] == 3
@@ -269,7 +271,7 @@ def plot_xHat(
     )
     plt.close()
 
-    if eval:
+    if evaluate:
         "save images separately"
         cv2.imwrite(
             os.path.join(figure_path, "{}_img.png".format(name)), 255 * img[:, :, ::-1]
@@ -395,7 +397,7 @@ def plotEmbedding(
     metric="euclidean",
     suffix="",
     env_name="TurtlebotMazeEnv-v0",
-    eval=False,
+    evaluate=False,
 ):
     # matplotlib.rcParams['backend'] = 'TkAgg'
     gt2plotParts = None
@@ -422,7 +424,6 @@ def plotEmbedding(
         proj_dim = 2
         gt2plot, colors = angle2Dhsv(measures)
     elif "Reacher" in env_name:
-        torus = True
         colors = measures[:, 0] % (2 * np.pi)
         gt2plot = obs2torus(measures)
     else:
@@ -495,7 +496,7 @@ def plotEmbedding(
                 saved_step=saved_step,
                 proj_dim=proj_dim,
                 suffix=namePart,
-                eval=eval,
+                evaluate=evaluate,
             )
     else:
         createFig(
@@ -510,7 +511,7 @@ def plotEmbedding(
             saved_step=saved_step,
             proj_dim=proj_dim,
             suffix=suffix,
-            eval=eval,
+            evaluate=evaluate,
         )
 
 
@@ -526,7 +527,7 @@ def createFig(
     saved_step=None,
     proj_dim=2,
     suffix="",
-    eval=False,
+    evaluate=False,
 ):
     linewidth = 0
     size = 8

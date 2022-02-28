@@ -11,7 +11,7 @@ This is the official PyTorch implementation of the paper titled "**Exploratory S
 If you find this useful for your research, please use the following citation.
 ```
 @misc{merckling2021exploratory,
-      title={Exploratory State Representation Learning}, 
+      title={Exploratory State Representation Learning},
       author={Astrid Merckling and Nicolas Perrin-Gilbert and Alexandre Coninx and Stéphane Doncieux},
       year={2021},
       eprint={2109.13596},
@@ -111,9 +111,9 @@ This will produce 'logsXSRL/hashCode' folder, where all the outputs are going to
 
 To evaluate a XSRL model during/after training run:
 ```bash
-dir=<XSRL_trained_model_path>
+my_my_dir=<XSRL_trained_model_path>
 mpirun -np 1 python -u -W ignore SRL4RL/xsrl/evalXSRL.py \
-    --dir $dir
+    --my_dir $my_dir
 ```
 
 ## RAE Training
@@ -134,9 +134,9 @@ This will produce 'logsRAE/hashCode' folder, where all the outputs are going to 
 
 To evaluate a RAE model during/after training, run:
 ```bash
-dir=<RAE_trained_model_path>
+my_dir=<RAE_trained_model_path>
 mpirun -np 1 python -u -W ignore SRL4RL/ae/evalAE.py \
-    --dir $dir
+    --my_dir $my_dir
 ```
 
 
@@ -175,9 +175,9 @@ This will produce 'logsRL/hashCode' folder, where all the outputs are going to b
 
 To compute the episode returns averaged over 100 episodes (`--n_eval_traj 100`) with the best RL policy (`--model_type model_best`) during/after training, run:
 ```bash
-dir=<RL_trained_model_path>
+my_dir=<RL_trained_model_path>
 mpirun -np 1 python -u -W ignore SRL4RL/rl/demo.py \
-    --dir $dir \
+    --my_dir $my_dir \
     --model_type model_best \
     --n_eval_traj 100
 ```
@@ -185,9 +185,9 @@ mpirun -np 1 python -u -W ignore SRL4RL/rl/demo.py \
 
 To record an evaluation video (`--save_video True`) and all image frames (`--save_image True`), with a good resolution (`--highRes True`), with the best RL policy (`--model_type model_best`) during/after training, run:
 ```bash
-dir=<RL_trained_model_path>
+my_dir=<RL_trained_model_path>
 mpirun -np 1 python -u -W ignore SRL4RL/rl/demo.py \
-    --dir $dir \
+    --my_dir $my_dir \
     --model_type model_best \
     --save_video True \
     --save_image True \
@@ -196,9 +196,9 @@ mpirun -np 1 python -u -W ignore SRL4RL/rl/demo.py \
 
 To view the policy during/after training, run:
 ```bash
-dir=<RL_trained_model_path>
+my_dir=<RL_trained_model_path>
 mpirun -np 1 python -u -W ignore SRL4RL/rl/demo.py \
-    --dir $dir \
+    --my_dir $my_dir \
     --model_type model_best \
     --renders True
 ```
@@ -216,7 +216,7 @@ Stéphane Doncieux, Alexandre Coninx and Nicolas Perrin-Gilbert: supervised the 
 
 ```
 @misc{merckling2021exploratory,
-      title={Exploratory State Representation Learning}, 
+      title={Exploratory State Representation Learning},
       author={Astrid Merckling and Nicolas Perrin-Gilbert and Alexandre Coninx and Stéphane Doncieux},
       year={2021},
       eprint={2109.13596},

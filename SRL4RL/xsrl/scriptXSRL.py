@@ -3,61 +3,60 @@
 Astrid Merckling
 XSRL
 """
+import gc
+import hashlib
+import json
+import os
+from collections import OrderedDict
+from datetime import datetime, timedelta
 from pprint import pprint
+from time import time
+
+import gym
 import matplotlib
 import numpy as np
-import gym
 import torch
-import os
-import json, hashlib
-from datetime import datetime, timedelta
-from time import time
-from collections import OrderedDict
-import gc
-
 from bullet_envs.utils import PY_MUJOCO, AddNoise
 
+from SRL4RL import SRL4RL_path
+from SRL4RL.utils.env_wrappers import BulletWrapper
 from SRL4RL.utils.nn_torch import (
     CNN,
     CNN_Transpose,
     MLP_mdn,
     MLP_Module,
-    pytorch2numpy,
     numpy2pytorch,
-    set_seeds,
+    pytorch2numpy,
     save_model,
+    set_seeds,
 )
 from SRL4RL.utils.utils import (
-    createFolder,
-    saveConfig,
     EarlyStopping,
-    loadConfig,
-    get_hidden,
-    update_text,
+    createFolder,
     float2string,
+    get_hidden,
+    loadConfig,
+    saveConfig,
     saveJson,
+    update_text,
 )
-from SRL4RL.utils.env_wrappers import BulletWrapper
-from SRL4RL.utils.utilsEnv import add_noise, render_env, giveEnv_name, reset_stack
-from SRL4RL import SRL4RL_path
-
+from SRL4RL.utils.utilsEnv import add_noise, giveEnv_name, render_env, reset_stack
 from SRL4RL.utils.utilsPlot import plot_xHat, plotter
-
-from SRL4RL.xsrl.utils import (
-    policy_last_layer,
-    omega_last_layer,
-    getPiExplore,
-    piExplore2obs,
-    resetState,
-    XSRL_nextObsEval,
-    update_target_network,
-)
 from SRL4RL.xsrl.arguments import (
-    is_with_discoveryPi,
-    get_args,
-    update_args_XSRL,
-    giveXSRL_name,
     assert_args_XSRL,
+    get_args,
+    giveXSRL_name,
+    is_with_discoveryPi,
+    update_args_XSRL,
+)
+from SRL4RL.xsrl.utils import (
+    XSRL_nextObsEval,
+    getPiExplore,
+    omega_last_layer,
+    piExplore2obs,
+    policy_last_layer,
+    resetState,
+    update_target_network,
 )
 
 "register bullet_envs in gym"
@@ -69,12 +68,19 @@ args = update_args_XSRL(args)
 
 "Pretraining setup"
 all_dir = None
-if args.dir:
-    if args.dir[-1] != "/":
-        args.dir += "/"
-    loaded_config = loadConfig(args.dir)
+if args.my_dir:
+    if args.my_dir[-1] != "/":
+        args.my_dir += "/"
+    loaded_config = loadConfig(args.my_dir)
     dir_hashCode = loaded_config["hashCode"]
-    remove_keys = ["keep_seed", "dir", "debug", "reset_policy", "patience", "n_epochs"]
+    remove_keys = [
+        "keep_seed",
+        "my_dir",
+        "debug",
+        "reset_policy",
+        "patience",
+        "n_epochs",
+    ]
     if args.keep_seed:
         assert loaded_config["hashCode"] == dir_hashCode
         if "all_dir" in loaded_config:
@@ -148,7 +154,7 @@ np2torch = lambda x: numpy2pytorch(x, differentiable=False, device=cpu)
 np2torchDev = lambda x: numpy2pytorch(x, differentiable=False, device=device)
 
 if args.evalExplor:
-    "to eval on a max of 500 steps"
+    "to evaluate on a max of 500 steps"
     args.maxStep -= args.num_envs - 1
 
 if args.maxStep == np.inf:
@@ -161,7 +167,7 @@ else:
     print("maxSteps: ", maxSteps)
 
 "Environment settings"
-evalSteps = 5  # to evaluate reconstructed images
+evalSteps = 5  # to evaluate predicted images
 
 maxSteps_visuExplor_env = 1000  # good because bigger than len(testDataset)=400
 if args.seed == 123456:
@@ -329,7 +335,7 @@ else:
 if all_dir:
     config["all_dir"] = all_dir
 if args.keep_seed:
-    save_path = args.dir
+    save_path = args.my_dir
 else:
     save_path = os.path.join(SRL4RL_path, args.logs_dir)
     "Create folder, save config"
@@ -353,24 +359,24 @@ if args.beta_dim == 0:
     args.beta_dim = args.state_dim + action_dim
 reset_policy, reset_inverse = True, True
 
-if args.dir:
+if args.my_dir:
     print("Load: alpha, beta, gamma, omega")
     alpha, beta, gamma = torch.load(
-        args.dir + "state_model.pt", map_location=torch.device(device)
+        args.my_dir + "state_model.pt", map_location=torch.device(device)
     )
     omega = torch.load(
-        args.dir + "state_model_tail.pt", map_location=torch.device(device)
+        args.my_dir + "state_model_tail.pt", map_location=torch.device(device)
     )
     if with_discoveryPi and (not args.reset_policy):
         print("Load: pi_head, mu_tail, log_sig_tail")
         reset_policy = False
         pi_head, mu_tail, log_sig_tail = torch.load(
-            args.dir + "piExplore.pt", map_location=torch.device(cpu)
+            args.my_dir + "piExplore.pt", map_location=torch.device(cpu)
         )
     if dir_inverse and not args.reset_policy:
         print("Load: iota")
         reset_inverse = False
-        iota = torch.load(args.dir + "iota.pt", map_location=torch.device(cpu))
+        iota = torch.load(args.my_dir + "iota.pt", map_location=torch.device(cpu))
 else:
     print("Create: alpha, beta, gamma, omega")
     "Alpha function: create features for an observation"
@@ -622,7 +628,7 @@ dones = [False] * args.num_envs
 envs_to_reset = np.array(dones, dtype=np.bool)
 reseted = np.arange(args.num_envs)[envs_to_reset]
 
-if args.dir:
+if args.my_dir:
     del loaded_config
     gc.collect()
 
@@ -809,7 +815,7 @@ while (
     s_next = gamma(input_gamma)
 
     "update SRL network"
-    "Reconstruct observations of current step for all trajectories"
+    "Predict next observations of current step for all trajectories"
     xHat_next = omega_last_layer(omega(s_next))
     lossNextObs = (
         Loss_obs(xHat_next, np2torchDev(next_observations), args.num_envs).sum(
@@ -1590,7 +1596,7 @@ while (
                 input_gamma = torch.cat((o_alpha, o_beta), dim=1)
                 s_nextEval = gamma(input_gamma)
 
-                "Reconstruct observations of current step for all trajectories"
+                "Predict next observations of current step for all trajectories"
                 xHat_nextEval = pytorch2numpy(omega_last_layer(omega(s_nextEval)))
                 "save outputs"
                 images_hat[evalStep] = xHat_nextEval[:, -3:, :, :]
@@ -1606,7 +1612,7 @@ while (
                 evalState = pytorch2numpy(s_nextEval)
                 observation = add_noise(next_observation.copy(), noise_adder, config)
 
-        "Reconstruct observations for visualization"
+        "Predict next observations for visualization"
         frame = 0
         frames = slice(frame, frame + evalSteps)
         "reshape to HWC"
@@ -1628,7 +1634,7 @@ while (
             gradientStep=elapsed_gradients,
             suffix=suffix,
         )
-        "Reconstruct observations for visualization"
+        "Predict next observations for visualization"
         for i in range(len(images)):
             plot_xHat(
                 images[i],

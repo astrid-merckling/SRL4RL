@@ -11,16 +11,15 @@ import torch
 from mpi4py import MPI
 
 from SRL4RL import SRL4RL_path
-from SRL4RL.rl.arguments import get_args, update_args_RL, assert_args_RL
-from SRL4RL.rl.arguments import giveRL_name
+from SRL4RL.rl.arguments import assert_args_RL, get_args, giveRL_name, update_args_RL
 from SRL4RL.rl.modules.sac_agent import sac_agent
-from SRL4RL.rl.utils.env_utils import make_env, get_env_params, load_config
+from SRL4RL.rl.utils.env_utils import get_env_params, load_config, make_env
 from SRL4RL.utils.nn_torch import set_seeds
 from SRL4RL.utils.utils import (
     createFolder,
     encoder_methods,
-    learning_methods,
     giveSRL_name,
+    learning_methods,
     loadConfig,
     saveConfig,
     saveJson,
@@ -54,17 +53,17 @@ if __name__ == "__main__":
         args.seed = datetime.now().microsecond
 
     args.random_buffer = True
-    if args.dir:
-        if args.dir[-1] != "/":
-            args.dir += "/"
-        config = loadConfig(args.dir)
-        keep_keys = ["dir", "debug"]
+    if args.my_dir:
+        if args.my_dir[-1] != "/":
+            args.my_dir += "/"
+        config = loadConfig(args.my_dir)
+        keep_keys = ["my_dir", "debug"]
 
         select_new_args = {k: args.__dict__[k] for k in keep_keys}
         config.update(select_new_args)
         if config["srl_path"]:
             "update srl_path"
-            config["srl_path"] = args.dir
+            config["srl_path"] = args.my_dir
 
         "force the Garbage Collector to release unreferenced memory"
         del select_new_args, keep_keys
@@ -78,8 +77,8 @@ if __name__ == "__main__":
     args = update_args_RL(args)
     args = assert_args_RL(args)
 
-    if args.dir:
-        config["save_dir"] = args.dir
+    if args.my_dir:
+        config["save_dir"] = args.my_dir
     else:
         # Building the experiment config file
         config = OrderedDict(sorted(args.__dict__.items()))
@@ -99,7 +98,7 @@ if __name__ == "__main__":
         createFolder(save_path, "save_path folder already exist")
 
     if config["method"] in encoder_methods:
-        if config["dir"] and config["srl_path"]:
+        if config["my_dir"] and config["srl_path"]:
             srl_config = loadConfig(config["srl_path"], name="srl_config")
             config["SRL_name"] = (
                 giveXSRL_name(srl_config)

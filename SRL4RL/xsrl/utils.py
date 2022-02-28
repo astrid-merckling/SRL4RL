@@ -1,23 +1,24 @@
-import torch
-import numpy as np
-import os
-import cv2
 import gc
+import os
+
+import cv2
+import numpy as np
+import torch
 
 from SRL4RL import SRL4RL_path
-from SRL4RL.utils.utilsPlot import visualizeMazeExplor, plot_xHat, plotEmbedding
-from SRL4RL.utils.utilsEnv import (
-    reset_stack,
-    add_noise,
-    update_video,
-    tensor2image,
-    NCWH2WHC,
-    render_env,
-)
-from SRL4RL.utils.nn_torch import pytorch2numpy, numpy2pytorch, save_model
-from SRL4RL.utils.utils import loadPickle, createFolder
-from SRL4RL.xsrl.arguments import is_with_discoveryPi
 from SRL4RL.rl.utils.runner import StateRunner
+from SRL4RL.utils.nn_torch import numpy2pytorch, pytorch2numpy, save_model
+from SRL4RL.utils.utils import createFolder, loadPickle
+from SRL4RL.utils.utilsEnv import (
+    NCWH2WHC,
+    add_noise,
+    render_env,
+    reset_stack,
+    tensor2image,
+    update_video,
+)
+from SRL4RL.utils.utilsPlot import plot_xHat, plotEmbedding, visualizeMazeExplor
+from SRL4RL.xsrl.arguments import is_with_discoveryPi
 
 np2torch = lambda x, device: numpy2pytorch(x, differentiable=False, device=device)
 
@@ -170,8 +171,8 @@ def XSRL_nextObsEval(
     suffix="last",
     debug=False,
 ):
-    eval = suffix == "eval"
-    if eval:
+    evaluate = suffix == "evaluate"
+    if evaluate:
         path_eval = os.path.join(save_dir, "eval2obs")
         createFolder(path_eval, "eval2obs already exist")
     actionRepeat = config["actionRepeat"]
@@ -281,7 +282,7 @@ def XSRL_nextObsEval(
                 o_beta = beta(torch.cat((np2torch(stateExpl, device), TensA), dim=1))
                 input_gamma = torch.cat((o_alpha, o_beta), dim=1)
                 s_next = gamma(input_gamma)
-                "Reconstruct observations of current elapsed_steps for all trajectories"
+                "Predict next observations of current elapsed_steps for all trajectories"
                 xHat = omega_last_layer(omega(s_next))
                 loss_log += pytorch2numpy(
                     Loss_obs(xHat, np2torch(next_observation, device))
@@ -322,7 +323,7 @@ def XSRL_nextObsEval(
                             name=name,
                             gradientStep=gradientStep,
                             suffix=suffix,
-                            eval=eval,
+                            evaluate=evaluate,
                         )
                 else:
                     plot_xHat(
@@ -334,7 +335,7 @@ def XSRL_nextObsEval(
                         name=name_,
                         gradientStep=gradientStep,
                         suffix=suffix,
-                        eval=eval,
+                        evaluate=evaluate,
                     )
                 if elapsed_steps == xHat_nextObsEval_step:
                     if saved_step is not None:
@@ -348,7 +349,7 @@ def XSRL_nextObsEval(
                             gradientStep=gradientStep,
                             saved_step=saved_step,
                         )
-            if eval:
+            if evaluate:
                 "plot image of all time steps"
                 plot_xHat(
                     NCWH2WHC(observation[:, -3:, :, :]),
@@ -376,7 +377,7 @@ def XSRL_nextObsEval(
     cv2.destroyAllWindows()
 
     loss_logNorm = loss_log / len_traj
-    print(" " * 100 + "done : nextObsEval = {:.3f}".format(loss_logNorm))
+    print(" " * 100 + "done: nextObsEval = {:.3f}".format(loss_logNorm))
 
     plotEmbedding(
         "UMAP",
@@ -388,7 +389,7 @@ def XSRL_nextObsEval(
         proj_dim=3,
         suffix=suffix,
         env_name=config["env_name"],
-        eval=eval,
+        evaluate=evaluate,
     )
     plotEmbedding(
         "PCA",
@@ -400,7 +401,7 @@ def XSRL_nextObsEval(
         proj_dim=3,
         suffix=suffix,
         env_name=config["env_name"],
-        eval=eval,
+        evaluate=evaluate,
     )
     "force the Garbage Collector to release unreferenced memory"
     del (
@@ -433,7 +434,7 @@ def piExplore2obs(
     save_dir,
     suffix="last",
     debug=False,
-    eval=False,
+    evaluate=False,
     saved_step=None,
 ):
     device = torch.device(config["device"])
@@ -448,7 +449,7 @@ def piExplore2obs(
     else:
         camera_id_eval = -1
         imLabel = "env"
-    if eval:
+    if evaluate:
         path_eval = os.path.join(save_dir, "piExplore2obs{}/".format(saved_step))
         createFolder(path_eval, "piExplore2obs already exist")
         path_eval_im = os.path.join(save_dir, "piExplore2im{}/".format(saved_step))
@@ -493,7 +494,7 @@ def piExplore2obs(
         has_bump = True
         num_bump = 0
         while has_bump:
-            if eval:
+            if evaluate:
                 assert num_bump < 500, "num_bump > 500"
             num_bump += 1
             if with_discoveryPi:
@@ -536,7 +537,7 @@ def piExplore2obs(
             input_gamma = torch.cat((o_alpha, o_beta), dim=1)
             s_next = gamma(input_gamma)
 
-            "Reconstruct observations of current step for all trajectories"
+            "Predict next observations of current step for all trajectories"
             xHat = omega_last_layer(omega(s_next))
 
         "update video"
@@ -548,7 +549,7 @@ def piExplore2obs(
             fpv=config["fpv"],
             concatIM=255 * tensor2image(xHat[:, -3:, :, :]),
         )
-        if eval:
+        if evaluate:
             im_high_render = (
                 render_env(
                     envExplor,
@@ -610,7 +611,7 @@ def getPiExplore(
     save_dir,
     n_epoch=None,
     debug=False,
-    eval=False,
+    evaluate=False,
     suffix="",
 ):
     assert config["env_name"] in [
@@ -646,7 +647,7 @@ def getPiExplore(
         has_bump = True
         num_bump = 0
         while has_bump:
-            if eval:
+            if evaluate:
                 assert num_bump < 500, "num_bump > 500"
             num_bump += 1
             if with_discoveryPi:
@@ -719,8 +720,8 @@ class XSRLRunner(StateRunner):
     def update_state(self, x, demo=False):
         with torch.no_grad():
             "predict next state"
-            input = add_noise(x, self.noise_adder, self.noiseParams)
-            o_alpha = self.alpha(input.to(self.device)).to("cpu")
+            inputs = add_noise(x, self.noise_adder, self.noiseParams)
+            o_alpha = self.alpha(inputs.to(self.device)).to("cpu")
             "FNNs only faster with cpu"
             o_beta = self.beta(
                 torch.cat((self.state, np2torch(self.pi, "cpu").unsqueeze(0)), dim=1)
@@ -728,7 +729,7 @@ class XSRLRunner(StateRunner):
             input_gamma = torch.cat((o_alpha, o_beta), dim=1)
             new_state = self.gamma(input_gamma)
         if demo:
-            self.last_input = pytorch2numpy(input)[0][-3:, :, :].transpose(1, 2, 0)
+            self.last_inputs = pytorch2numpy(inputs)[0][-3:, :, :].transpose(1, 2, 0)
         self.state = new_state
         return new_state
 

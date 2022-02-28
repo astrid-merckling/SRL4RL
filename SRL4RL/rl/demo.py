@@ -1,25 +1,27 @@
-import torch
-import numpy as np
-import os, json
-import cv2
-from datetime import datetime
 import argparse
+import json
+import os
 import shutil
+import traceback
+from datetime import datetime
 
-from bullet_envs.utils import env_with_goals, PY_MUJOCO
+import cv2
+import numpy as np
+import torch
+from bullet_envs.utils import PY_MUJOCO, env_with_goals
 
-from SRL4RL.utils.utilsEnv import update_video, render_env
-from SRL4RL.rl.utils.env_utils import make_env
 from SRL4RL.rl.modules.agent_utils import process_inputs
+from SRL4RL.rl.utils.env_utils import make_env
+from SRL4RL.utils.nn_torch import set_seeds
 from SRL4RL.utils.utils import (
-    str2bool,
-    loadConfig,
+    createFolder,
     encoder_methods,
     give_name,
+    loadConfig,
     saveConfig,
-    createFolder,
+    str2bool,
 )
-from SRL4RL.utils.nn_torch import set_seeds
+from SRL4RL.utils.utilsEnv import render_env, update_video
 
 RANDOM = False
 seperate_csv = False
@@ -144,7 +146,7 @@ def eval_agent(
                 input_tensor = None
             with torch.no_grad():
                 pi = runner.forward(
-                    actor_network, input_tensor, eval=True, random=RANDOM
+                    actor_network, input_tensor, evaluate=True, random=RANDOM
                 )
 
             observation_new, reward, done, info = env.step(pi)
@@ -264,7 +266,7 @@ def eval_agent(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dir", type=str)
+    parser.add_argument("--my_dir", type=str)
     parser.add_argument(
         "--save_video",
         type=str2bool,
@@ -310,13 +312,16 @@ if __name__ == "__main__":
         assert not (args_init.save_video or args_init.save_image)
 
     demo_length = args_init.demo_length
-    print("\nproj_path: ", args_init.dir)
-    args_init.dir = args_init.dir[:-1] if args_init.dir[-1] == "/" else args_init.dir
-    all_proj_opt, file = os.path.split(args_init.dir)
+    print("\nproj_path: ", args_init.my_dir)
+    args_init.my_dir = (
+        args_init.my_dir[:-1] if args_init.my_dir[-1] == "/" else args_init.my_dir
+    )
+    all_proj_opt, file = os.path.split(args_init.my_dir)
     try:
-        config = loadConfig(args_init.dir)
-    except:
-        print("\nNeed remove folder: %s\n" % args_init.dir)
+        config = loadConfig(args_init.my_dir)
+    except Exception:
+        print("\nNeed remove folder: %s\n" % args_init.my_dir)
+        traceback.print_exc()
         exit()
 
     env_params = config["env_params"]
@@ -325,11 +330,11 @@ if __name__ == "__main__":
     args.__dict__.update(config)
     "change args with args_init"
     args.renders = args_init.renders
-    args.dir = args_init.dir
+    args.my_dir = args_init.my_dir
     args.highRes = args_init.highRes
 
     args.seed = datetime.now().microsecond
-    print("\nSeed is : \n", args.seed)
+    print("\nSeed is: \n", args.seed)
     "IMPORTANT TO USE FOR CUDA MEMORY"
     set_seeds(args.seed)
 
@@ -340,11 +345,12 @@ if __name__ == "__main__":
     "Load RL model"
     try:
         o_mean, o_std, g_mean, g_std, actor_network, _ = torch.load(
-            args_init.dir + "/{}.pt".format(args_init.model_type),
+            args_init.my_dir + "/{}.pt".format(args_init.model_type),
             map_location=lambda storage, loc: storage,
         )
-    except:
+    except Exception:
         print("\nNot {}.pt saved".format(args_init.model_type))
+        traceback.print_exc()
         exit()
 
     actor_network.eval()
@@ -374,7 +380,7 @@ if __name__ == "__main__":
     """
     Create the environment with the SRL model wrapper
     """
-    args.srl_path = args_init.dir
+    args.srl_path = args_init.my_dir
     args.demo = True
     # args.random_target = False
     # args.distractor = True
@@ -385,18 +391,18 @@ if __name__ == "__main__":
     # Create video folder
     if args_init.save_video:
         video_path = (
-            args.dir + "/piEval-best-E%s.mp4" % config["best_elapsed_epochs"]
+            args.my_dir + "/piEval-best-E%s.mp4" % config["best_elapsed_epochs"]
             if args_init.model_type == "model_best"
-            else args.dir + "/piEval-last-E%s.mp4" % config["last_elapsed_epochs"]
+            else args.my_dir + "/piEval-last-E%s.mp4" % config["last_elapsed_epochs"]
         )
 
     else:
         video_path = ""
     if args_init.save_image:
         image_path = (
-            args.dir + "/piEval-best-E%s/" % config["best_elapsed_epochs"]
+            args.my_dir + "/piEval-best-E%s/" % config["best_elapsed_epochs"]
             if args_init.model_type == "model_best"
-            else args.dir + "/piEval-last-E%s/" % config["last_elapsed_epochs"]
+            else args.my_dir + "/piEval-last-E%s/" % config["last_elapsed_epochs"]
         )
         createFolder(image_path, image_path + " already exist")
     else:
@@ -430,6 +436,6 @@ if __name__ == "__main__":
             mean_rewardProgress if mean_rewardProgress != 0 else ""
         )
         config[prefix + "avg-steps"] = average_steps
-        saveConfig(config, save_dir=args.dir)
-        with open(os.path.join(args.dir, "exp_config.json"), "w") as outfile:
+        saveConfig(config, save_dir=args.my_dir)
+        with open(os.path.join(args.my_dir, "exp_config.json"), "w") as outfile:
             json.dump(config, outfile)

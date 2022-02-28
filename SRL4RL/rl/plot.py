@@ -1,13 +1,14 @@
-import os
-import matplotlib.pyplot as plt
-import matplotlib
-import numpy as np
-import glob2
 import argparse
+import os
+import traceback
+
+import glob2
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
 import seaborn as sns
 
-from SRL4RL.utils.utils import loadConfig, give_name, str2bool
-
+from SRL4RL.utils.utils import give_name, loadConfig, str2bool
 
 matplotlib.use("Agg")
 
@@ -41,7 +42,7 @@ def complete_pad(xs, last_value=False, backprop_per_eval=None):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--dir", type=str)
+parser.add_argument("--my_dir", type=str)
 parser.add_argument("--smooth", type=int, default=0)
 parser.add_argument("--verbose", type=int, default=1)
 parser.add_argument("--with_subDir", type=str2bool, default=False, help="")
@@ -57,12 +58,12 @@ text_file = "success_rates.txt"
 if args.with_subDir:
     paths = [
         os.path.abspath(os.path.join(path, ".."))
-        for path in glob2.glob(os.path.join(args.dir, "**", text_file))
+        for path in glob2.glob(os.path.join(args.my_dir, "**", text_file))
     ]
 else:
     paths = [
         os.path.abspath(os.path.join(path, ".."))
-        for path in glob2.glob(os.path.join(args.dir, "*", text_file))
+        for path in glob2.glob(os.path.join(args.my_dir, "*", text_file))
     ]
 
 
@@ -74,8 +75,9 @@ for curr_path in paths:
         config = loadConfig(curr_path, name="exp_config.pkl")
         with open(os.path.join(curr_path, text_file)) as f:
             success_rate = np.array(f.read().split("\n"), dtype=np.float32)
-    except:
+    except Exception:
         print("\nskipping {}\n".format(curr_path))
+        traceback.print_exc()
         continue
 
     env_id = config["new_env_name"]
@@ -190,7 +192,7 @@ for env_id in sorted(data.keys()):
 
     for option in sorted(data[env_id].keys()):
         for chosen_model in list_order:
-            for nb_model, model_name in enumerate(data[env_id][option].keys()):
+            for _, model_name in enumerate(data[env_id][option].keys()):
                 if chosen_model in model_name:
                     if "AE" == chosen_model[:2] and "VAE" in model_name:
                         continue
@@ -289,8 +291,8 @@ for env_id in sorted(data.keys()):
         plt.yticks([-0.2, 0.0, 0.2, 0.4, 0.6, 0.8, 1.0])
 
     # figure.tight_layout()
-    save_path = os.path.join(args.dir, "plot_success_{}.pdf".format(env_id))
-    print("\nSave figure to : %s\n" % save_path)
+    save_path = os.path.join(args.my_dir, "plot_success_{}.pdf".format(env_id))
+    print("\nSave figure to: %s\n" % save_path)
     plt.savefig(save_path, bbox_inches="tight", format="pdf", pad_inches=0)
 
     # Get current size

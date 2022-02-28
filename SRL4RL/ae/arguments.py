@@ -1,11 +1,10 @@
 import argparse
 
-from bullet_envs.utils import PYBULLET_ENV, NOISES
+import numpy as np
+from bullet_envs.utils import NOISES, PYBULLET_ENV
 
 from SRL4RL.utils.utils import str2bool
-from SRL4RL.utils.utilsEnv import update_args_envs, assert_args_envs
-import numpy as np
-
+from SRL4RL.utils.utilsEnv import assert_args_envs, update_args_envs
 
 AE_variants = [
     "AE",
@@ -24,7 +23,10 @@ def get_args():
     parser.add_argument("--debug", type=int, default=0, help="1 for debugging")
     "Logs hyper-parameters"
     parser.add_argument(
-        "--dir", type=str, default="", help="path of the pretrained model to initialize"
+        "--my_dir",
+        type=str,
+        default="",
+        help="path of the pretrained model to initialize",
     )
     parser.add_argument(
         "--logs_dir", type=str, default="logs", help="path where to save the models"
@@ -40,7 +42,7 @@ def get_args():
         "--seed", type=int, default=123456, help="Random seed to use"
     )  # 123456
     parser.add_argument(
-        "--keep_seed", type=str2bool, default=False, help="only with dir"
+        "--keep_seed", type=str2bool, default=False, help="only with my_dir"
     )
     "Environment hyper-parameters"
     parser.add_argument(

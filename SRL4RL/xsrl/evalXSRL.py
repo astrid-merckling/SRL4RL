@@ -1,25 +1,25 @@
-import matplotlib
+import argparse
 from datetime import datetime
+
+import gym
+import matplotlib
+import torch
+from bullet_envs.utils import PY_MUJOCO, AddNoise
+
+from SRL4RL.utils.env_wrappers import BulletWrapper
+from SRL4RL.utils.nn_torch import set_seeds
+from SRL4RL.utils.utils import loadConfig, str2bool
+from SRL4RL.xsrl.arguments import is_with_discoveryPi
+from SRL4RL.xsrl.utils import XSRL_nextObsEval, getPiExplore, piExplore2obs
 
 # matplotlib.use('nbAgg') # 'nbAgg', 'TkAgg', 'WebAgg'
 
-import torch
-import argparse
-import gym
-
-from bullet_envs.utils import AddNoise, PY_MUJOCO
-from SRL4RL.utils.utils import str2bool, loadConfig
-from SRL4RL.utils.nn_torch import set_seeds
-from SRL4RL.xsrl.utils import XSRL_nextObsEval, piExplore2obs, getPiExplore
-from SRL4RL.xsrl.arguments import is_with_discoveryPi
-from SRL4RL.utils.env_wrappers import BulletWrapper
 
 "register bullet_envs in gym"
 import bullet_envs.__init__
 
-
 parser = argparse.ArgumentParser(description="State representation learning new method")
-parser.add_argument("--dir", type=str, default="", help="Model path")
+parser.add_argument("--my_dir", type=str, default="", help="Model path")
 parser.add_argument("--debug", type=int, default=0, help="1 for debugging")
 parser.add_argument("--renders", type=str2bool, default=False, help="")
 parser.add_argument("--nextObsEval_test", type=str2bool, default=True, help="")
@@ -31,10 +31,10 @@ if not debug:
 
     matplotlib.use("Agg")
 
-dir = args.dir
-if dir[-1] != "/":
-    dir += "/"
-config = loadConfig(dir, name="exp_config")
+my_dir = args.my_dir
+if my_dir[-1] != "/":
+    my_dir += "/"
+config = loadConfig(my_dir, name="exp_config")
 
 device = torch.device("cpu")
 config["device"] = "cpu"
@@ -45,9 +45,9 @@ if "n_stack" not in config:
 args.__dict__.update(config)
 
 alpha, beta, gamma = torch.load(
-    dir + "state_model.pt", map_location=torch.device(device)
+    my_dir + "state_model.pt", map_location=torch.device(device)
 )
-omega = torch.load(dir + "state_model_tail.pt", map_location=torch.device(device))
+omega = torch.load(my_dir + "state_model_tail.pt", map_location=torch.device(device))
 alpha.eval(), beta.eval(), gamma.eval(), omega.eval()
 
 
@@ -59,11 +59,11 @@ set_seeds(seed_testDataset)
 # TODO: remove comments !
 if args.nextObsEval_test:
     nextObsEval = XSRL_nextObsEval(
-        alpha, beta, gamma, omega, config, dir, suffix="eval", debug=debug
+        alpha, beta, gamma, omega, config, my_dir, suffix="evaluate", debug=debug
     )
 
 
-"eval exploration"
+"evaluate exploration"
 
 maxSteps_visuExplor_env = 1001
 if config["env_name"] in ["TurtlebotEnv-v0", "TurtlebotMazeEnv-v0"]:
@@ -130,9 +130,11 @@ with_discoveryPi = is_with_discoveryPi(config)
 
 if with_discoveryPi:
     pi_head, mu_tail, log_sig_tail = torch.load(
-        dir + "piExplore.pt", map_location=torch.device(device)
+        my_dir + "piExplore.pt", map_location=torch.device(device)
     )
-    omega = torch.load(dir + "state_model_tail.pt", map_location=torch.device(device))
+    omega = torch.load(
+        my_dir + "state_model_tail.pt", map_location=torch.device(device)
+    )
     pi_head.eval(), mu_tail.eval(), log_sig_tail.eval()
 else:
     pi_head, mu_tail, log_sig_tail = None, None, None
@@ -149,10 +151,10 @@ piExplore2obs(
     mu_tail,
     log_sig_tail,
     config,
-    dir,
-    suffix="eval",
+    my_dir,
+    suffix="evaluate",
     debug=debug,
-    eval=True,
+    evaluate=True,
     saved_step=config["elapsed_epochs"],
 )
 
@@ -168,8 +170,8 @@ if config["env_name"] in ["TurtlebotEnv-v0", "TurtlebotMazeEnv-v0"]:
         mu_tail,
         log_sig_tail,
         config,
-        dir,
+        my_dir,
         debug=debug,
-        eval=True,
+        evaluate=True,
         suffix=suffix,
     )

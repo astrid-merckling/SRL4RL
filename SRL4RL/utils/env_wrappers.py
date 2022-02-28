@@ -1,8 +1,8 @@
 import gym
 import numpy as np
 
-from SRL4RL.utils.utilsEnv import renderPybullet
 from SRL4RL.utils.utils import state_baselines
+from SRL4RL.utils.utilsEnv import renderPybullet
 
 
 class GoalWrapper(gym.Wrapper):

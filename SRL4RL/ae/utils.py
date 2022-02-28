@@ -1,15 +1,16 @@
-import torch
-import numpy as np
-import os
-import cv2
 import gc
+import os
+
+import cv2
+import numpy as np
+import torch
 
 from SRL4RL import SRL4RL_path
-from SRL4RL.utils.utilsPlot import plot_xHat, plotEmbedding
-from SRL4RL.utils.utilsEnv import update_video, tensor2image, CWH2WHC
-from SRL4RL.utils.nn_torch import pytorch2numpy, numpy2pytorch, save_model
-from SRL4RL.utils.utils import loadPickle
 from SRL4RL.rl.utils.runner import StateRunner
+from SRL4RL.utils.nn_torch import numpy2pytorch, pytorch2numpy, save_model
+from SRL4RL.utils.utils import loadPickle
+from SRL4RL.utils.utilsEnv import CWH2WHC, tensor2image, update_video
+from SRL4RL.utils.utilsPlot import plot_xHat, plotEmbedding
 
 np2torch = lambda x, device="cpu": numpy2pytorch(x, differentiable=False, device=device)
 
@@ -35,7 +36,7 @@ def AE_nextObsEval(
     debug=False,
 ):
     device = torch.device(config["device"])
-    eval = suffix == "eval"
+    evaluate = suffix == "evaluate"
     actionRepeat = config["actionRepeat"]
 
     datasetEval_path = "testDatasets/testDataset_{}".format(config["new_env_name"])
@@ -179,7 +180,7 @@ def AE_nextObsEval(
                             name=name,
                             gradientStep=gradientStep,
                             suffix=suffix,
-                            eval=eval,
+                            evaluate=evaluate,
                         )
                 else:
                     plot_xHat(
@@ -190,7 +191,7 @@ def AE_nextObsEval(
                         name=name,
                         gradientStep=gradientStep,
                         suffix=suffix,
-                        eval=eval,
+                        evaluate=evaluate,
                     )
                 if elapsed_steps == xHat_nextObsEval_step:
                     if saved_step is not None:
@@ -213,7 +214,7 @@ def AE_nextObsEval(
     cv2.destroyAllWindows()
 
     nextObsEval = loss_log / len_traj
-    print(" " * 100 + "done : nextObsEval = {:.3f}".format(nextObsEval))
+    print(" " * 100 + "done: nextObsEval = {:.3f}".format(nextObsEval))
 
     plotEmbedding(
         "UMAP",
@@ -225,7 +226,7 @@ def AE_nextObsEval(
         proj_dim=3,
         suffix=suffix,
         env_name=config["env_name"],
-        eval=eval,
+        evaluate=evaluate,
     )
     plotEmbedding(
         "PCA",
@@ -237,7 +238,7 @@ def AE_nextObsEval(
         proj_dim=3,
         suffix=suffix,
         env_name=config["env_name"],
-        eval=eval,
+        evaluate=evaluate,
     )
 
     "force the Garbage Collector to release unreferenced memory"
@@ -249,7 +250,7 @@ def AE_nextObsEval(
 class AERunner(StateRunner):
     def __init__(self, config):
         super().__init__(config)
-        srl_path = config["srl_path"] if config["srl_path"] else config["dir"]
+        srl_path = config["srl_path"] if config["srl_path"] else config["my_dir"]
         if srl_path:
             print("Load: encoder")
             self.encoder = torch.load(

@@ -3,55 +3,55 @@
 Astrid Merckling
 AE/RAE/VAE
 """
+import gc
+import hashlib
+import json
+import os
+from collections import OrderedDict
+from datetime import datetime, timedelta
 from pprint import pprint
+from time import time
+
+import gym
 import matplotlib
 import numpy as np
-import gym
 import torch
-import os
-import json, hashlib
-from datetime import datetime, timedelta
-from time import time
-from collections import OrderedDict
-import gc
-
 from bullet_envs.utils import PY_MUJOCO, AddNoise
 
+from SRL4RL import SRL4RL_path
+from SRL4RL.ae.arguments import assert_args_AE, get_args, update_args_AE
+from SRL4RL.ae.utils import AE_nextObsEval, decoder_last_layer, reparametrize
+from SRL4RL.rl.modules.agent_utils import loadPi, process_inputs_gt
+from SRL4RL.utils.env_wrappers import BulletWrapper
 from SRL4RL.utils.nn_torch import (
     CNN,
     CNN_Transpose,
-    MLP_Module,
     Flatten,
-    pytorch2numpy,
-    numpy2pytorch,
+    MLP_Module,
     layers_MLP,
+    numpy2pytorch,
+    pytorch2numpy,
     save_model,
     set_seeds,
 )
 from SRL4RL.utils.utils import (
-    createFolder,
-    saveConfig,
     EarlyStopping,
-    loadConfig,
-    update_text,
+    createFolder,
     float2string,
-    saveJson,
     giveSRL_name,
+    loadConfig,
+    saveConfig,
+    saveJson,
+    update_text,
 )
-from SRL4RL.utils.env_wrappers import BulletWrapper
-from SRL4RL import SRL4RL_path
-
-from SRL4RL.utils.utilsPlot import plot_xHat, plotter
 from SRL4RL.utils.utilsEnv import (
     add_noise,
-    render_env,
     giveEnv_name,
-    update_video,
+    render_env,
     reset_stack,
+    update_video,
 )
-from SRL4RL.ae.utils import AE_nextObsEval, decoder_last_layer, reparametrize
-from SRL4RL.ae.arguments import get_args, update_args_AE, assert_args_AE
-from SRL4RL.rl.modules.agent_utils import loadPi, process_inputs_gt
+from SRL4RL.utils.utilsPlot import plot_xHat, plotter
 
 "register bullet_envs in gym"
 import bullet_envs.__init__
@@ -62,12 +62,12 @@ args = update_args_AE(args)
 
 "Pretraining setup"
 all_dir = None
-if args.dir:
-    if args.dir[-1] != "/":
-        args.dir += "/"
-    loaded_config = loadConfig(args.dir)
+if args.my_dir:
+    if args.my_dir[-1] != "/":
+        args.my_dir += "/"
+    loaded_config = loadConfig(args.my_dir)
     dir_hashCode = loaded_config["hashCode"]
-    remove_keys = ["debug", "dir", "keep_seed", "n_epochs", "patience"]
+    remove_keys = ["debug", "my_dir", "keep_seed", "n_epochs", "patience"]
     if args.keep_seed:
         assert loaded_config["hashCode"] == dir_hashCode
         if "all_dir" in loaded_config:
@@ -271,7 +271,7 @@ else:
 if all_dir:
     config["all_dir"] = all_dir
 if args.keep_seed:
-    save_path = args.dir
+    save_path = args.my_dir
 else:
     save_path = os.path.join(SRL4RL_path, args.logs_dir)
     "Create folder, save config"
@@ -292,19 +292,19 @@ pprint(config)
 
 "Initialize models"
 
-if args.dir:
+if args.my_dir:
     print("Load: encoder and decoder")
     encoder = torch.load(
-        os.path.join(args.dir, "state_model.pt"), map_location=torch.device(device)
+        os.path.join(args.my_dir, "state_model.pt"), map_location=torch.device(device)
     )
     if args.method == "VAE":
         decoder, logvar_fc = torch.load(
-            os.path.join(args.dir, "state_model_tail.pt"),
+            os.path.join(args.my_dir, "state_model_tail.pt"),
             map_location=torch.device(device),
         )
     else:
         decoder = torch.load(
-            os.path.join(args.dir, "state_model_tail.pt"),
+            os.path.join(args.my_dir, "state_model_tail.pt"),
             map_location=torch.device(device),
         )
 else:
@@ -433,7 +433,7 @@ if save_video:
         frameSize=(args.image_size, args.image_size),
     )
 
-if args.dir:
+if args.my_dir:
     del loaded_config
     gc.collect()
 
@@ -454,7 +454,7 @@ while not early_stopper.early_stop and elapsed_epochs < args.n_epochs:
                 for state_ in states
             ]
             ActEnv[has_bump] = [
-                actor.select_actions(x_, eval=False, goal=None) for x_ in x
+                actor.select_actions(x_, evaluate=False, goal=None) for x_ in x
             ]
         else:
             ActEnv[has_bump] = np.random.uniform(
@@ -685,7 +685,7 @@ while not early_stopper.early_stop and elapsed_epochs < args.n_epochs:
                 if with_policy and np.random.uniform(0, 1) < 0.5:
                     state = envEval.robot.calc_state()
                     x = process_inputs_gt(state, None, o_mean, o_std, g_mean, g_std)
-                    ActEnv = actor.select_actions(x, eval=False, goal=None)
+                    ActEnv = actor.select_actions(x, evaluate=False, goal=None)
                 else:
                     ActEnv = envEval.action_space.sample()
                     TensA = numpy2pytorch(

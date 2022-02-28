@@ -1,10 +1,9 @@
 import argparse
 
-from bullet_envs.utils import PY_MUJOCO, env_with_goals, NOISES, PYBULLET_ENV, ENV_ALIVE
+from bullet_envs.utils import ENV_ALIVE, NOISES, PY_MUJOCO, PYBULLET_ENV, env_with_goals
 
-from SRL4RL.utils.utils import state_baselines, encoder_methods, str2bool
-from SRL4RL.utils.utilsEnv import update_args_envs, assert_args_envs
-
+from SRL4RL.utils.utils import encoder_methods, state_baselines, str2bool
+from SRL4RL.utils.utilsEnv import assert_args_envs, update_args_envs
 
 """
 Here are the param for the training
@@ -30,7 +29,7 @@ def get_args():
     parser.add_argument("--seed", type=int, default=123456, help="random seed")
     "Loading pretrained models"
     parser.add_argument(
-        "--dir", type=str, default="", help="path of the model to continue training"
+        "--my_dir", type=str, default="", help="path of the model to continue training"
     )
     parser.add_argument(
         "--srl_path",
@@ -127,7 +126,7 @@ def get_args():
     parser.add_argument(
         "--automatic_entropy_tuning", type=str2bool, default=True, help="Tune entropy"
     )
-    "NN hyper-parameters : (actor and critic)"
+    "NN hyper-parameters: (actor and critic)"
     parser.add_argument(
         "--linearApprox",
         type=str2bool,
@@ -262,7 +261,7 @@ def update_args_RL(args):
     elif args.env_name in PY_MUJOCO:
         args.eval_interval = int(50)
 
-        """kostrikov2020DrQ use same parameters: 
+        """kostrikov2020DrQ use same parameters:
         for HalfCheetahBulletEnv-v0:
             init_temperature=0.1, batch_size=256, actionRepeat=4
         """

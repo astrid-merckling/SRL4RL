@@ -1,13 +1,11 @@
-from collections import OrderedDict
-from pprint import pprint
-import pickle, json
-from datetime import datetime
-
+import json
 import os
+import pickle
+import traceback
+from collections import OrderedDict, defaultdict
+from pprint import pprint
 
 import numpy as np
-from collections import defaultdict
-
 
 state_baselines = ["ground_truth", "pure_noise", "position", "openLoop"]
 learning_methods = ["RAE", "VAE", "AE", "XSRL"]
@@ -26,7 +24,8 @@ def get_hidden(nb_hidden):
         try:
             hidden = int(nb_hidden)
             return [hidden] if hidden > 0 else []
-        except:
+        except Exception:
+            traceback.print_exc()
             return []
 
 
@@ -102,11 +101,11 @@ class appendabledict(defaultdict):
         """indexes every value in the dict according to a specified slice
         Parameters
         ----------
-        slice : int or slice type
+        slice: int or slice type
             An indexing slice , e.g., ``slice(2, 20, 2)`` or ``2``.
         Returns
         -------
-        sliced_dict : dict (not appendabledict type!)
+        sliced_dict: dict (not appendabledict type!)
             A dictionary with each value from this object's dictionary, but the value is sliced according to slice_
             e.g. if this dictionary has {a:[1,2,3,4], b:[5,6,7,8]}, then self.subslice(2) returns {a:3,b:7}
                  self.subslice(slice(1,3)) returns {a:[2,3], b:[6,7]}"""
@@ -194,7 +193,7 @@ def loadJson(curr_path, name="exp_config"):
 
 
 def saveConfig(
-    config, print_config=False, eval=False, save_dir=None, name="exp_config"
+    config, print_config=False, evaluate=False, save_dir=None, name="exp_config"
 ):
     "Save the experiment config to a pkl file"
     if name[-4:] != ".pkl":
@@ -207,8 +206,8 @@ def saveConfig(
     # Sort by keys
     config = OrderedDict(sorted(config.items()))
     config_path = "{}/{}".format(save_dir, name)
-    if os.path.exists(config_path) and eval:
-        config_path = "{}/{}_eval".format(save_dir, name)
+    if os.path.exists(config_path) and evaluate:
+        config_path = "{}/{}_evaluate".format(save_dir, name)
 
     with open(config_path, "wb") as f:
         pickle.dump(config, f, protocol=pickle.HIGHEST_PROTOCOL)
@@ -221,9 +220,9 @@ def loadConfig(config_path, name="exp_config"):
         return pickle.load(f)
 
 
-def savePickle(dict, path):
+def savePickle(data_dict, path):
     with open(path, "wb") as f:
-        pickle.dump(dict, f)
+        pickle.dump(data_dict, f)
 
 
 def loadPickle(path):
@@ -236,29 +235,29 @@ def float2string(value, nfloat=3):
     return float2string.format(value)
 
 
-def update_text(list, save_path, text=False, replace=False, array=False):
+def update_text(data_list, save_path, text=False, replace=False, array=False):
     if os.path.isfile(save_path) and not replace:
         assert not array
         mode = "a"
         with open(save_path, mode) as file_object:
             if text:
                 file_object.write("\n")
-                file_object.write(list)
+                file_object.write(data_list)
             else:
                 file_object.write("\n")
-                file_object.write("\n".join(map(str, list)))
+                file_object.write("\n".join(map(str, data_list)))
     else:
         if array:
             if ".txt" == save_path[-4:]:
                 save_path = save_path[:-4]
-            np.save(save_path, list)
+            np.save(save_path, data_list)
         else:
             mode = "w"
             with open(save_path, mode) as file_object:
                 if text:
-                    file_object.write(list)
+                    file_object.write(data_list)
                 else:
-                    file_object.write("\n".join(map(str, list)))
+                    file_object.write("\n".join(map(str, data_list)))
 
 
 def createFolder(path_to_folder, exist_msg):

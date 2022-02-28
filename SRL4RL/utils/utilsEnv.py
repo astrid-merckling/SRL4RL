@@ -1,14 +1,13 @@
-import numpy as np
-import torch
-import cv2
 import pickle
 
-from bullet_envs.utils import PY_MUJOCO, env_with_distractor, env_with_fpv
+import cv2
+import numpy as np
+import torch
+from bullet_envs.utils import PY_MUJOCO, env_with_distractor
 
+from SRL4RL import user_path
 from SRL4RL.utils.nn_torch import numpy2pytorch, pytorch2numpy
 from SRL4RL.utils.utils import createFolder
-from SRL4RL import user_path
-
 
 CWH2WHC = lambda x: x.transpose(1, 2, 0)
 NCWH2WHC = lambda x: x.transpose(0, 2, 3, 1)[0]
@@ -192,8 +191,8 @@ def update_video(
 def load_cifar10(file):
     """load the cifar-10 data"""
     with open(file, "rb") as fo:
-        dict = pickle.load(fo, encoding="bytes")
-        im = dict[b"data"].reshape(-1, 3, 32, 32)
+        data_dict = pickle.load(fo, encoding="bytes")
+        im = data_dict[b"data"].reshape(-1, 3, 32, 32)
         im = im.transpose(0, 3, 2, 1)
     return im
 
@@ -225,7 +224,7 @@ def cutout(img, n_holes, length):
         w = img.shape[1]
         n_obs = None
 
-    for n in range(n_holes):
+    for _ in range(n_holes):
         y = np.random.randint(h, size=(n_obs))
         x = np.random.randint(w, size=(n_obs))
 
